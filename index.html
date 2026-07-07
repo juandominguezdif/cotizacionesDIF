@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DIF - Cotizaciones</title>
+  <style>
+    :root {
+      --dif-blue: #005baa;
+      --dif-blue-2: #1468ad;
+      --dif-orange: #f7941d;
+      --line: #cfcfcf;
+      --label-bg: #f0f2f5;
+      --page-w: 816px;
+      --page-h: 1056px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #202020;
+      color: #111;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }
+
+    .toolbar {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.22);
+    }
+
+    .toolbar-grid {
+      display: grid;
+      grid-template-columns: 1fr 260px 180px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .toolbar-title {
+      font-weight: 700;
+      color: var(--dif-blue);
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .2px;
+    }
+
+    .segmented {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .fcl-container-box {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .fcl-container-box.visible { display: block; }
+
+    .fcl-container-box select {
+      width: 190px;
+      border: 1px solid var(--dif-blue);
+      border-radius: 6px;
+      padding: 7px 8px;
+      color: var(--dif-blue);
+      font-weight: 700;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .segmented button,
+    .action-button {
+      border: 1px solid var(--dif-blue);
+      background: #fff;
+      color: var(--dif-blue);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .segmented button.active,
+    .action-button.primary {
+      background: var(--dif-blue);
+      color: #fff;
+    }
+
+    .language-box label,
+    .comment-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 12px;
+      color: #333;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .comments-panel {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+
+    .comments-panel textarea {
+      width: 100%;
+      min-height: 72px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      padding: 8px 10px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+    }
+
+    .comment-options {
+      margin-top: 8px;
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: #555;
+      margin-top: 8px;
+    }
+
+    .quote-page {
+      width: var(--page-w);
+      height: var(--page-h);
+      background: #fff;
+      margin: 0 auto 18px auto;
+      padding: 18px 24px 14px 24px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.12), 0 8px 24px rgba(0,0,0,.32);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-main {
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    .logo {
+      width: 92px;
+      height: auto;
+      display: block;
+      margin: 0 0 10px 2px;
+      background: transparent;
+    }
+
+    .quote-title {
+      text-align: center;
+      color: var(--dif-blue);
+      font-size: 21px;
+      font-weight: 700;
+      margin: 6px 0 28px 0;
+      line-height: 1;
+    }
+
+    .orange-line {
+      border-top: 2px solid var(--dif-orange);
+      margin: 0 0 12px 0;
+    }
+
+    table { border-collapse: collapse; width: 100%; }
+
+    .date-table {
+      table-layout: fixed;
+    }
+
+    .date-table th {
+      width: 50%;
+      background: var(--dif-blue-2);
+      color: #fff;
+      font-size: 16px;
+      line-height: 1;
+      height: 20px;
+      padding: 3px 8px;
+      text-align: center !important;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .date-table td {
+      width: 50%;
+      height: 24px;
+      text-align: center !important;
+      font-size: 14px;
+      padding: 4px 8px 6px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    .party-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 34px;
+      margin-top: 16px;
+    }
+
+    .party-table td {
+      vertical-align: middle;
+      height: 34px;
+      font-size: 13px;
+      padding: 5px 7px;
+    }
+
+    .party-table .label {
+      width: 165px;
+      background: var(--label-bg);
+      color: var(--dif-blue);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .details-title {
+      margin-top: 14px;
+      background: var(--dif-blue-2);
+      color: #fff;
+      text-align: center;
+      height: 20px;
+      line-height: 20px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .details-table td {
+      border: 1px solid var(--line);
+      height: 29px;
+      font-size: 12.5px;
+      padding: 4px 7px;
+      vertical-align: middle;
+    }
+
+    .details-table .label {
+      width: 135px;
+      background: var(--label-bg);
+      color: var(--dif-blue);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .details-table .value { width: 240px; }
+
+    .charges-table {
+      margin-top: 22px;
+      color: var(--dif-blue);
+      table-layout: fixed;
+    }
+
+    .charges-table thead th {
+      background: var(--dif-blue-2);
+      color: #fff;
+      height: 30px;
+      padding: 5px 5px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .charges-table thead th:first-child { text-align: left; }
+
+    .charges-table td {
+      height: 24px;
+      padding: 4px 5px;
+      font-size: 12px;
+      vertical-align: middle;
+      text-align: right;
+      line-height: 1.1;
+    }
+
+    .charges-table td:first-child { text-align: left; }
+
+    .charges-table .section td {
+      height: 26px;
+      padding-top: 7px;
+      color: var(--dif-blue);
+      font-size: 17px;
+      line-height: 1;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--dif-blue);
+    }
+
+    .charges-table .total-value { font-weight: 700; }
+
+    .charges-table.continuation {
+      margin-top: 34px;
+    }
+
+    .charges-table.continuation td {
+      font-size: 14px;
+      height: 30px;
+    }
+
+    .charges-table.continuation .section td {
+      font-size: 18px;
+      height: 32px;
+    }
+
+
+    .charges-zone {
+      display: block;
+    }
+
+    .after-charges {
+      display: block;
+    }
+
+    .page-continuation .logo,
+    .page-terms .logo {
+      margin-bottom: 34px;
+    }
+
+    .total-line {
+      margin-top: 44px;
+      border-top: 2px solid var(--dif-blue);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      color: var(--dif-blue);
+      font-size: 16px;
+      font-weight: 700;
+      padding: 10px 8px 0 8px;
+      min-height: 34px;
+    }
+
+    .total-line .amount { text-align: right; }
+
+    .total-line.multi {
+      grid-template-columns: 1.65fr 1fr 1fr 1fr;
+      column-gap: 8px;
+    }
+
+    .terms-title {
+      margin-top: 34px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      background: var(--dif-blue-2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .terms-block {
+      color: var(--dif-blue);
+      font-size: 12px;
+      line-height: 1.06;
+      padding: 10px 6px 0 6px;
+    }
+
+    .terms-subtitle {
+      font-weight: 700;
+      margin: 6px 0 7px 0;
+      font-size: 13px;
+      color: var(--dif-blue);
+    }
+
+    .terms-line {
+      margin: 0 0 1px 0;
+      color: var(--dif-blue);
+      font-size: 12px;
+      line-height: 1.06;
+    }
+
+    .terms-text { white-space: pre-line; }
+
+    .footer {
+      border-top: 2px solid var(--dif-blue);
+      color: #536271;
+      text-align: center;
+      font-size: 9.5px;
+      line-height: 1.5;
+      padding-top: 4px;
+      margin-top: auto;
+    }
+
+
+    .internal-comment-print {
+      display: none;
+      color: var(--dif-blue);
+      border: 1px solid var(--dif-blue);
+      margin-top: 18px;
+      padding: 8px 10px;
+      font-size: 12px;
+      white-space: pre-line;
+    }
+
+    .internal-comment-print strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .show-comment .internal-comment-print {
+      display: block;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 880px) {
+      .app-shell { padding-left: 8px; padding-right: 8px; }
+      .toolbar-grid { grid-template-columns: 1fr; }
+      .quote-page {
+        transform-origin: top center;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .app-shell { padding: 0; max-width: none; }
+      .toolbar, .comments-panel { display: none !important; }
+      .quote-page {
+        width: 8.5in;
+        min-height: 11in;
+        height: 11in;
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+      .quote-page:last-child { page-break-after: auto; break-after: auto; }
+      @page { size: Letter; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <section class="toolbar">
+      <div class="toolbar-grid">
+        <div>
+          <p class="toolbar-title">Tipo de cotización</p>
+          <div class="segmented" id="typeButtons">
+            <button data-type="FCL">FCL</button>
+            <button data-type="LCL">LCL</button>
+            <button data-type="AEREO">Aéreo</button>
+          </div>
+          <div class="fcl-container-box" id="fclContainerBox">
+            <p class="toolbar-title" style="margin-top:12px;">Contenedores FCL visibles</p>
+            <select id="fclContainerCount" aria-label="Cantidad de columnas de contenedores FCL">
+              <option value="1">1 contenedor: 20FT</option>
+              <option value="2">2 contenedores: 20FT + 40FT</option>
+              <option value="3" selected>3 contenedores: 20FT + 40FT + 40FT HC</option>
+            </select>
+          </div>
+        </div>
+        <div class="language-box">
+          <p class="toolbar-title">Idioma</p>
+          <label><input type="radio" name="lang" value="ES" checked> Español</label>
+          <label><input type="radio" name="lang" value="EN"> English</label>
+        </div>
+        <div>
+          <p class="toolbar-title">Acciones</p>
+          <button class="action-button primary" id="printBtn">Imprimir / PDF</button>
+          <button class="action-button" id="copyBtn" style="margin-top:8px;">Copiar HTML</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="comments-panel">
+      <p class="toolbar-title">Comentario interno de control</p>
+      <textarea id="internalComment" placeholder="Escribe aquí un comentario para esta combinación de tipo e idioma. Se guarda localmente en este navegador."></textarea>
+      <div class="comment-options">
+        <label><input type="checkbox" id="showCommentInQuote"> Mostrar comentario dentro de la cotización</label>
+      </div>
+      <div class="status-text" id="commentStatus">Sincronizado localmente.</div>
+    </section>
+
+    <main id="quoteRoot"></main>
+  </div>
+
+  <script>
+    const LOGO_URL = 'https://dif.com.do/img/dif.png';
+
+    const termsCatalog = {
+      "Aduana / Aéreo": {
+            "ES": "1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Desembolsos o adelantos pagados, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n3-DIF no maneja gestión aduanal a embarques de particulares.-\n4-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n5-Tasa de Servicio aduanero US$0.25/Kgs solo para LCL y aéreos Min.  US$ 65.-\n6-No incluye cargos de terceros.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Las comisiones bancarias se facturarán al costo.-\n9-Si el consignatario no está enlazado con DIF en la Dirección General de Aduanas, se les facturara US$35 por motivos de enlace.-\n10-impresión de AWB US$ 50 (si aplica).-\n11-Permiso VUCE USD $50 (si aplica).-\n12-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n13-Tarifa de seguro de carga 0,75% sobre el valor C&F.-\n14-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\n15-TARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Merchandise must comply legal requirements of the Dominican Republic.-\n2-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n3-DIF does not handle customs clearance to particulars.-\n4-Duties and taxes are not included (are calculated over CIF value+18% of IVA).-\n5-Custom Service Tax US$0.25/Kgs Min US$65.-\n6-Third-party charges NOT included.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Bank fees will be billed at cost.-\n9-If Cnee is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n10-AWB printing US$ 50 (if apply).-\n11-VUCE Permit USD $50 per permit.-\n12-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n13-Cargo insurance rate 0.75% over C&F value.-\n14-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Aduana / FCL": {
+            "ES": "1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Tarifa no incluye ningún cargo de terceros.-\n3-Desembolsos o adelantos pagados en nombre del cnee, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n4-DIF no maneja gestión aduanal a embarques de particulares.-\n5-Si el consignatario no está enlazado con DIF en la Dirección General de Aduanas, se les facturara US$35 por motivos de enlace.-\n6-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n7-Tasa de Servicio aduanero US$75/20’ y US$100/40’.-\n8-DPH/PORT COLLECT: Cargos de demora y días libres depende de la línea naviera utilizada.  Depósito de US$300 dólares aprox.-\n9-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n10-THC depende la línea naviera utilizada.-\n11-Tarifa sujeta a cargos bancarios; serán facturados al costo.-\n12-Cada Gestión Permisos Vuce USD50.00 (si aplica).-\n13-Cargos Portuarios DP World Caucedo: https://www.dpworld.com/es/dominicana/customer-centre/rates.-\n14-Cargos Portuarios Haina International Terminal: https://hit.com.do/servicios/.-\n15-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n16-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n17-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-The merchandise must accomplish with the legal requirements of the Dominican Republic.-\n2-Third-party charges NOT included.-\n3-Duties and taxes not included (calculated based on CIF value).-\n4-DIF does not handle customs clearance to particulars.-\n5-If Cnee is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n6-Bank fees will be billed at cost.-\n7-Subject to Customs service fee US$75/20' and US$100/40'.-\n8-DPH/PORT COLLECT: Demurrage charges and free days depend on the shipping line used. Deposit of US$300 dollars approx. is required.-\n9-THC depends on the shipping line used. Rates subject to bank charges; They will be invoiced at cost.-\n10-Vuce Permits fee USD50.00 (if applicable).-\n11-DP World Caucedo Port Charges:  https://www.dpworld.com/es/dominicana/customer-centre/rates.-\n12-Haina International Terminal Port Charges:  https://hit.com.do/servicios/.-\n13-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n14-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n15-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n16-Cargo insurance rate 0.75% over C&F value.-\n17-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Aduana / LCL": {
+            "ES": "1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Desembolsos o adelantos pagados, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n3-DIF no maneja gestión aduanal a embarques de particulares.-\n4-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n5-Tasa de Servicio aduanero US$0.25/Kgs solo para LCL y aéreos Min. US$ 65.-\n6-No incluye cargos de terceros.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Las comisiones bancarias se facturarán al costo.-\n9-Si el consignatario no está enlazado con DIF en la Dirección General de Aduanas, se les facturara US$35 por motivos de enlace.-\n10-Impresión de BL US$ 50 (si aplica).-\n11-Permiso VUCE USD $50 (si aplica).-\n12-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n13-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n14-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Merchandise must comply legal requirements of the Dominican Republic.-\n2-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n3-DIF does not handle customs clearance to particulars.-\n4-Duties and taxes are not included (are calculated over CIF value+18% of IVA).-\n5-Custom Service Tax US$0.25/Kgs Min. US$65.-\n6-Third-party charges NOT included.-\n7-Cllect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Bank fees will be billed at cost.-\n9-If Cnee is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n10-BL printing US$ 50 (if apply).-\n11-VUCE Permit USD $50 per permit.-\n12-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n13-Cargo insurance rate 0.75% over C&F value.-\n14-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Aduana No aplica": {
+            "ES": "LCL\n1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Desembolsos o adelantos pagados, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n3-DIF no maneja gestión aduanal a embarques de particulares.-\n4-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n5-Tasa de Servicio aduanero US$0.25/Kgs solo para LCL y aéreos Min. US$ 65.-\n6-No incluye cargos de terceros.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Las comisiones bancarias se facturarán al costo.-\n9-Si el consignatario no está enlazado con DIF en la Dirección General de Aduanas, se les facturara US$35 por motivos de enlace.-\n10-Impresión de BL US$ 50 (si aplica).-\n11-Permiso VUCE USD $50 (si aplica).-\n12-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n13-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n\nFCL\n1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Tarifa no incluye ningún cargo de terceros.-\n3-Desembolsos o adelantos pagados en nombre del cnee, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n4-DIF no maneja gestión aduanal a embarques de particulares.-\n5-Si el consignatario no está enlazado con DIF en la Dirección General de Aduanas, se les facturara US$35 por motivos de enlace.-\n6-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n7-Tasa de Servicio aduanero US$75/20’ y US$100/40’.-\n8-DPH/PORT COLLECT: Cargos de demora y días libres depende de la línea naviera utilizada.  Depósito de US$300 dólares aprox.-\n9-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n10-THC depende la línea naviera utilizada.-\n11-Tarifa sujeta a cargos bancarios; serán facturados al costo.-\n12-Cada Gestión Permisos Vuce USD50.00 (si aplica).-\n13-Cargos Portuarios DP World Caucedo: https://www.dpworld.com/es/dominicana/customer-centre/rates.-\n14-Cargos Portuarios Haina International Terminal: https://hit.com.do/servicios/.-\n15-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n16-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n\nAereo\n1-La mercancía deberá cumplir con los requisitos legales de la República Dominicana.-\n2-Desembolsos o adelantos pagados, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n3-DIF no maneja gestión aduanal a embarques de particulares.-\n4-Aranceles e impuestos no incluidos (se calculan sobre la base del valor CIF).-\n5-Tasa de Servicio aduanero US$0.25/Kgs solo para LCL y aéreos Min.  US$ 65.-\n6-No incluye cargos de terceros.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Las comisiones bancarias se facturarán al cos",
+            "EN": "LCL\n1-Merchandise must comply legal requirements of the Dominican Republic.-\n2-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n3-DIF does not handle customs clearance to particulars.-\n4-Duties and taxes are not included (are calculated over CIF value+18% of IVA).-\n5-Custom Service Tax US$0.25/Kgs Min. US$65.-\n6-Third-party charges NOT included.-\n7-Cllect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Bank fees will be billed at cost.-\n9-If Cnee is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n10-BL printing US$ 50 (if apply).-\n11-VUCE Permit USD $50 per permit.-\n\nFCL \n1-The merchandise must comply with the legal requirements of the Dominican Republic.-\n2-Rate does not include any third party charges.-\n3-Disbursements or advances paid on behalf of the cnee, a 5% Outlay Fee Min: US$15.00 will be applied.-\n4-DIF does not handle customs management for shipments from individuals.-\n5-If the consignee is not linked to DIF in the General Customs office , they will be billed US$35 for.-\n6-Tariffs and taxes not included (they are calculated based on the CIF value).-\n7-Customs Service Rate US$75/20' and US$100/40'.-\n8-DPH/PORT COLLECT: Delay charges and free days depend on the shipping line used. Deposit of US$300 approx.-\n9-Collect fee: 5% (Min. US $ 50 - Max. US $ 375).-\n10-THC depends on the shipping line used.-\n11-Rate subject to bank charges; will be billed at cost.-\n12-Each Vuce Permit Management USD 50.00 (if applicable).-\n13-DP World Caucedo Port Charges: https://www.dpworld.com/es/dominicana/customer-centre/rates.-\n14-Haina International Terminal Port Charges: https://hit.com.do/servicios/.-\n15-We emphasize to our clients the importance of insuring their cargo, due to the limitations of legal responsibilities applicable by international agreements, by airlines, shipping lines, truck transporters and other agents involved.-\n16-Cargo insurance rate 0.75% on the C&F value.-\n\nAereo\n1-Merchandise must comply legal requirements of the Dominican Republic.-\n2-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n3-DIF does not handle customs clearance to particulars.-\n4-Duties and taxes are not included (are calculated over CIF value+18% of IVA).-\n5-Custom Service Tax US$0.25/Kgs Min US$65.-\n6-Third-party charges NOT included.-\n7-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n8-Bank fees will be billed at cost.-\n9-If Cnee is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n10-AWB printing US$ 50 (if apply).-\n11-VUCE Permit USD $50 per permit.-\n12-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n13-Cargo insurance rate 0.75% over C&F value.-"
+      },
+      "Embarque / Exportaciones": {
+            "ES": "1-Frecuencia y tiempo de tránsito sujetos a cambio sin previo aviso.-\n2-Si el embarque es inspeccionado por aduanas en destino o durante algún trasbordo, el tiempo de tránsito puede variar y cargos adicionales pudieran generarse.-\n3-No incluye ningún cargo de destino.-\n4-En caso de NO recibir la actualización de tarifa luego de la confirmación del zarpe de su contenedor/carga, favor de contactarnos y solicitar la misma, ya que manejar esta información, es responsabilidad de ambas partes, y las mismas están sujetas a cambios de acuerdo con las fluctuaciones del mercado.-\n5-Toda paleta utilizada deberá de estar debidamente fumigada y certificada. (Aplica para carga LCL).-\n6-El embarcador es responsable del embalaje de la mercancía.-\n7-Cut Off Documentos y mercancías, 48 horas antes de la salida.-\n8-Cargos por Almacenaje y/o Roll Over, no incluidos.-\n9-Desembolsos o adelantos pagados, será aplicado un 5% de Outlay Fee Min: US$15.00.-\n10-Tarifa NO aplica para carga peligrosa, con sobrepeso o sobredimensionada.-\n11-Enlace aduanas USD$35; solo aplica si el Shipper no está enlazado. (proceso puede tomar una semana).-\n12-Gestión Permisos Vuce USD50.00 por cada Vuce. (si aplica).-\n13-Gestión de Reembarque USD $150 (si aplica).-\n14-Cargos bancarios se facturarán al costo. (si aplica).-\n15-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n16-No somos NVOCC para emitir HBL, si tiene un formato HBL, envíenos para completarlo.-\n17-Tarifa sujeta a cargo de Chasis, USD60/día, en el caso de FCL.-\n18-Aplican cargos por cancelación del servicio, los mismos varían dependiendo la línea aérea/co-loader/línea naviera con la que se gestione el flete.-\n19-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n20-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n21-De generarse cargos en destino, se le enviara una factura adicional con dichos cargos.-\n22-Cotización basada en peso y dimensiones suministrados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Frequency and transit time are subject to change without previous advice.-\n2-If the shipment is inspected by Customs at destination, the transit time could change and additional charges could apply.-\n3-Destination charges are not included.-\n4-Bank fees will be billed at cost (if applicable).-\n5-Please confirm the rates before Shipment. If you don’t receive rates updates after cargo departure, make sure to confirm the applicable rates, as it is responsibility of both parts to manage this information because rates and additional charges are subject to changes according to market fluctuation.-\n6-All pallets used must be duly fumigated and certified.-\n7-Disbursements or payments in advanced of any charges will be billed as per 5% outlay fee Min: US$ 15.00.-\n8-The shipper is responsible of the packaging of the shipment.-\n9-Cut off doc and loading, 48 hours prior to sailing.-\n10-Storage charges and Roll over are not included.-\n11-Rates are NOT applicable for Hazardous cargo, Oversizes, Overweight.-\n12-In order to issue HBL, Agent should provide the editable HBL form.-\n13-Each Vuce Management Permits USD50 (if applicable).-\n14-Re-shipment process USD150 (if applicable).-\n15-Collect fee: 5% (Mín. US $ 50 - Máx. US $ 375).-\n16-We are not NVOCC in order to issue HBL, if you have and HBL format, please send us in order to fill it.-\n17-If Shipper is not linked to DIF at the DGA, a charge of US $35 Will be billed by Linking process.-\n18-Charges apply for cancellation of the service by the shipper or consignees, they vary depending on the line/Airline with which the freight is managed.-\n19-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n20-Cargo insurance rate 0.75% over C&F value.-\n21-If additional charges are generated at destination, same will be billed accordingly.-\n22-Quotation based on the weight and dimensions provided by the customer, any variation in them could mean a change in the amount of the quote.-\nRates are subject to itbis 18%"
+      },
+      "Embarque / Importación / Aérea": {
+            "ES": "IMPORT CARGA AEREA\n1-Flete y Bunker sujeto a cambios por parte de la línea aérea y por efecto de la fluctuación del mercado sin previo aviso, por lo que, en las condiciones actuales, esta tarifa es indicativa.uales, esta tarifa es indicativa.-\n2-Tarifa válida para carga no peligrosa, ni sobrepeso ni sobredimensionada.-  \n3-Los vuelos e itinerarios están sujetos a cambios y Cancelaciones.-\n4-Aplican cargos por cancelación del servicio, los mismos varían de acuerdo a la línea con la que se ofrezca el servicio.-\n5-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-  \n6-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n7-El tiempo de tránsito es estimado, sujeto a variaciones.-\n8-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Freight and bunker subject to changes from airline and due to Market fluctuations, without prior notice; therefore this rate is indicative.-\n2-Rate valid for non-dangerous cargo, neither overweight.-\n3-Flights and itineraries are subject to changes and cancellations.-\n4-If Cancellation additional charges may apply; they may vary according to the airline.-\n5-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n6-Cargo insurance rate 0.75% over C&F value.-\n7-Transit time is estimated.-\n8-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Embarque / Importación / FCL": {
+            "ES": "1-Tarifa sujeta a cambios por parte de la línea Naviera sin previo aviso.-\n2-Aplican cargos por cancelación del servicio, los mismos varían de acuerdo con la línea naviera con la que se ofrezca el servicio.-\n3-Tarifa no es válida para carga peligrosa, ni con sobrepeso, ni sobredimensionada (en caso de FB o FR).-\n4-Salidas e itinerarios sujetos a cambios sin previo aviso.-\n5-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n6-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n7-El tiempo de tránsito es estimado, sujeto a variaciones.-\n8-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Rates are subject to changes from shipping line and due to Market fluctuations, without prior notice therefore this rate is indicative.-\n2-Rate valid for non-dangerous cargo, neither overweight.-\n3-Sailings and itineraries are subject to changes and cancellations.-\n4-In case of cancellation, additional charges may apply; they may vary according to the shipping line.-\n5-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n6-Cargo insurance rate 0.75% over C&F value.-\n7-Transit time is estimated.-\n8-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Embarque / Importación / FCL / Miami": {
+            "ES": "1-Tarifa sujeta a cambios por parte de la línea Naviera sin previo aviso.-\n2-Tarifa sujeta a cargo de USD100.00 por Weight Permit en los Drayages/ Transportes locales de Miami de contenedores que excedan las 44,000 libras.-\n3-Bunker sujeto a cambio sin previo aviso por efecto de la fluctuación del mercado.-\n4-Tarifa no es válida para carga peligrosa, con sobrepeso, o sobredimensionada (en caso de FB o FR).-\n5-Para carga peligrosa aplican los sigtes cargos: *Hazmat US$150.00 \t*Documentación HAZ US$100.00.-\n6-Aplican cargos por cancelación del servicio, los mismos varían de acuerdo con la línea naviera con la que se ofrezca el servicio.-\n7-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n8-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n9-El tiempo de tránsito es estimado, sujeto a variaciones.-\n10.Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\nTARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Rates are subject to changes from shipping line and due to Market fluctuations, without prior notice therefore this rate is indicative.-\n2-Rate valid for non-dangerous cargo, neither overweight.-\n3-Sailings and itineraries are subject to changes and cancellations.-\n4-In case of cancellation, additional charges may apply; they may vary according to the shipping line.-\n5-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n6-Cargo insurance rate 0.75% over C&F value.-\n7-Transit time is estimated.-\n8-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Embarque / Importación / LCL": {
+            "ES": "1-Tarifa sujeta a cambios por parte del Coloader sin previo aviso.-\n2-Tarifa no es valida para carga peligrosa, ni sobredimensionada, ni con sobrepeso.-\n3-Aplican cargos por cancelación del servicio, los mismos varían de acuerdo con el co-loader con el que se ofrezca el servicio.-\n4-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n5-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n6-El tiempo de tránsito es estimado, sujeto a variaciones.-\n7-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\n8-TARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Rates are subject to changes from shipping line and due to Market fluctuations, without prior notice therefore this rate is indicative.-\n2-Rate is not valid for hazardous cargo, neither over dimensioned, nor over weighted.-\n3-If Cancellation additional charges may apply; they may vary according to the co-loader.-\n4-Sailings and itineraries are subject to changes and cancellations.-\n5-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.- \n6-Cargo insurance rate 0.75% over C&F value.-\n7-Transit time is estimated.-\n8-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\n9-Rates are subject to itbis 18%"
+      },
+      "Embarque / Importación / LCL / Miami": {
+            "ES": "1-Cotización basada en peso y dimensiones dados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\n2-Bunker sujeto a cambio sin previo aviso por efecto de la fluctuación del mercado.-\n3-Tarifa no aplica para carga, con sobrepeso, ni sobredimensionada.-\n4-Carga Peligrosa aplica los sigtes cargos: *Hazmat US$150.00 \t*Documentación Carga Peligrosa US$100.00.-\n5-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n6-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n7-El tiempo de tránsito es estimado, sujeto a variaciones.-\n8-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\n9-TARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\n2-Rates are subject to changes from shipping line and due to Market fluctuations, without prior notice therefore this rate is indicative.-\n3-Rate valid for non-dangerous cargo, neither overweight, nor over dimension.-\n4-If Cancellation additional charges may apply; they may vary according to the co-loader.-\n5-Sailings and itineraries are subject to changes and cancellations.-\n6-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n7-Cargo insurance rate 0.75% over C&F value.-\n8-Transit time is estimated.-\n9-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\nRates are subject to itbis 18%"
+      },
+      "Transporte": {
+            "ES": "1-Para FCL - 4 horas libres para Carga/Descarga de contenedores, luego de este tiempo se cobrará un costo adicional por concepto de hora extra de USD $22 por hora.-\n2-Si la dirección de entrega difiere con la dirección cotizada, se cobrará la diferencia.-\n3-Retorno de contenedor vacío aplica 60% del viaje dentro de la ciudad y 100% en el interior del país.-\n4-Tarifa sujeta al costo del Chasis USD $60 diarios. Aplica para FCL.-\n5-Para LCL y Aereo - 2 horas libres para Carga/Descarga de camiones LCL o algo por el estilo luego de este tiempo se cobrará un costo adicional por concepto de hora extra de USD $22 por hora.-  \n6-Descarga en destino no incluida.-\n7-Recalcamos a nuestros clientes la importancia de asegurar su carga, a causa de las limitaciones de responsabilidades legales aplicables por los convenios internacionales, por parte de las aerolíneas, líneas marítimas, transportistas de camiones y otros agentes involucrados.-\n8-Tarifa de seguro de carga 0.75% sobre el valor C&F.-\n9-Cotización basada en peso y dimensiones informados por el cliente, cualquier variación en los mismos podría significar un cambio en el monto de la cotización.-\n10-TARIFA SUJETA A ITBIS DE 18%",
+            "EN": "1-FCL - 4 free hours for Loading/Unloading containers, after this time an additional cost will be charged of US$22 /hour for overtime.-\n2-If delivery address is different to quoted address, difference of rate will be invoiced.-\n3-Return of empty container applies 60% of the trip within city limits and 100% outside the city.-\n4-Chassis charge USD $60 daily / Applies to FCL.-\n5-LCL & Air Cargo - 2 free hours for Loading/Unloading trucks, after this time an additional cost will be charged of USD $22/ hour for overtime.-\n6-Unloading at destination not included.-\n7-We recommend to our clients the importance of ensuring their cargo, due to the limitations of legal responsibilities applicable by international agreement, of airlines, maritime lines, truck carriers and other agents involved.-\n8-Cargo insurance rate 0.75% over C&F value.-\n9-Quote based on weight and dimensions provided by customer; any change may vary quotation final amount.-\n10-Rates are subject to itbis 18%"
+      }
+};
+
+    const terms = {
+      ES_AIR: termsCatalog["Embarque / Importación / Aérea"].ES,
+      EN_AIR: termsCatalog["Embarque / Importación / Aérea"].EN,
+      ES_FCL: termsCatalog["Embarque / Importación / FCL"].ES,
+      EN_FCL: termsCatalog["Embarque / Importación / FCL"].EN,
+      ES_LCL: termsCatalog["Embarque / Importación / LCL"].ES,
+      EN_LCL: termsCatalog["Embarque / Importación / LCL"].EN,
+      ES_CUSTOMS_AIR: termsCatalog["Aduana / Aéreo"].ES,
+      EN_CUSTOMS_AIR: termsCatalog["Aduana / Aéreo"].EN,
+      ES_CUSTOMS_FCL: termsCatalog["Aduana / FCL"].ES,
+      EN_CUSTOMS_FCL: termsCatalog["Aduana / FCL"].EN,
+      ES_CUSTOMS_LCL: termsCatalog["Aduana / LCL"].ES,
+      EN_CUSTOMS_LCL: termsCatalog["Aduana / LCL"].EN,
+      ES_TRANSPORT: termsCatalog["Transporte"].ES,
+      EN_TRANSPORT: termsCatalog["Transporte"].EN
+    };
+
+
+    const quoteData = {
+      AEREO: {
+        ES: {
+          title: 'COTIZACIÓN COT-000014500',
+          labels: {
+            date: 'FECHA', expires: 'VIGENCIA', customer: 'CLIENTE', executive: 'EJECUTIVO DE VENTAS', email: 'EMAIL', agent: 'AGENTE', address: 'DIRECCIÓN', phone: 'TELÉFONO', shipmentInfo: 'DETALLES DEL EMBARQUE', origin: 'ORIGEN', destination: 'DESTINO', incoterm: 'INCOTERM', measure: 'PESO CARGABLE', type: 'TIPO DE EMBARQUE', pieces: 'PIEZAS', transit: 'TRÁNSITO', route: 'RUTA', payment: 'CONDICIÓN PAGO', description: 'DESCRIPCIÓN', application: 'APLICACIÓN', qty: 'QTY', amount: 'CANTIDAD', min: 'MIN', total: 'TOTAL', terms: 'TERMINOS Y CONDICIONES', remarks: 'NOTAS EMBARQUE', internalComment: 'COMENTARIO INTERNO'
+          },
+          values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'Aéreo', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Pago a 45 días', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
+          headers: ['DESCRIPCIÓN','APLICACIÓN','QTY','CANTIDAD','MIN','TOTAL'],
+          page1: [
+            {section:'CARGOS DE FLETE'},
+            ['DRAYAGE','CNTR','1.00','43.00','0.00','43.00'],
+            ['FLETE LCL - CFT','CFT','80,741.61','2.60','230.00','209,928.19'],
+            ['BUNKER - CFT','CFT','80,741.61','100.00','0.33','225.00'],
+            {section:'CARGOS DE ORIGEN'},
+            ['FORWARDING FEE','AWB','1.00','100.00','0.00','100.00'],
+            ['BL FEE','AWB','1.00','35.00','0.00','35.00'],
+            ['SED','UNIT','1.00','30.00','0.00','30.00'],
+            ['SECURITY FEE','KGS','21.00','1.54','0.00','32.34'],
+            ['DELIVERY CHARGES','UNIT','1.00','12.00','0.00','12.00'],
+            ['AWB','AWB','1.00','35.00','0.00','35.00']
+          ],
+          page2: [ ['SED (Si aplica)','UNIT','1.00','123.00','0.00','123.00'], ['PICKUP','UNIT','1.00','432.00','0.00','432.00'], ['BL','AWB','1.00','35.00','0.00','35.00'], ['SED','UNIT','1.00','32.00','0.00','32.00'] ],
+          terms: [{title:'NOTAS EMBARQUE', text: terms.ES_AIR}]
+        },
+        EN: {
+          title: 'QUOTATION COT-000014500',
+          labels: {
+            date: 'DATE', expires: 'DATE EXPIRES IN', customer: 'CUSTOMER', executive: 'EXECUTIVE', email: 'EMAIL', agent: 'AGENT', address: 'DESTINATION', phone: 'PHONE', shipmentInfo: 'SHIPMENT INFORMATION', origin: 'ORIGIN', destination: 'DESTINATION', incoterm: 'INCOTERM', measure: 'CHARGEABLE WEIGHT', type: 'TYPE OF SHIPMENT', pieces: 'PIECES', transit: 'TRANSIT TIME', route: 'ROUTE', payment: 'PAYMENT TERMS', description: 'DESCRIPTION', application: 'APLICATION', qty: 'QTY', amount: 'AMOUNT', min: 'MIN', total: 'TOTAL', terms: 'TERMS AND CONDITIONS', remarks: 'SHIPMENT REMARKS', internalComment: 'INTERNAL COMMENT'
+          },
+          values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'Air Cargo', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Payment in 45 days', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
+          headers: ['DESCRIPTION','APLICATION','QTY','AMOUNT','MIN','TOTAL'],
+          page1: [
+            {section:'FREIGHT OF CHARGES'},
+            ['DRAYAGE','CNTR','1.00','43.00','0.00','43.00'],
+            ['FREIGHT SERVICES','CFT','80,741.61','2.60','230.00','209,928.19'],
+            ['FUEL SURCHARGE','CFT','80,741.61','100.00','0.33','225.00'],
+            {section:'CHARGES OF ORIGIN'},
+            ['ORIGIN CHARGES (I)','AWB','1.00','100.00','0.00','100.00'],
+            ['BL','AWB','1.00','35.00','0.00','35.00'],
+            ['ORIGIN CHARGES (I)','UNIT','1.00','30.00','0.00','30.00'],
+            ['SECURITY FEE','KGS','21.00','1.54','0.00','32.34'],
+            ['DELIVERY CHARGES','UNIT','1.00','12.00','0.00','12.00'],
+            ['AWB','AWB','1.00','35.00','0.00','35.00']
+          ],
+          page2: [ ['SED','UNIT','1.00','123.00','0.00','123.00'], ['PICK UP','UNIT','1.00','432.00','0.00','432.00'], ['BL','AWB','1.00','35.00','0.00','35.00'], ['SED','UNIT','1.00','32.00','0.00','32.00'] ],
+          terms: [{title:'SHIPMENT REMARKS', text: terms.EN_AIR}]
+        }
+      },
+      LCL: {},
+      FCL: {}
+    };
+
+    quoteData.LCL.ES = {
+      title: 'COTIZACIÓN COT-000014500',
+      labels: { ...quoteData.AEREO.ES.labels, measure: 'VOLUMEN' },
+      values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'LCL', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Pago a 45 días', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
+      headers: ['DESCRIPCIÓN','APLICACIÓN','QTY','CANTIDAD','MIN','MAX','TOTAL'],
+      page1: [
+        {section:'CARGOS DE FLETE'},
+        ['DRAYAGE','CNTR','1.00','43.00','0.00','0.00','43.00'],
+        ['FLETE LCL - CFT','CFT','80,741.61','2.60','230.00','0.00','209,928.19'],
+        ['BUNKER - CFT','CFT','80,741.61','100.00','0.33','225.00','225.00'],
+        {section:'CARGOS DE ORIGEN'},
+        ['FORWARDING FEE','BL','1.00','100.00','0.00','100.00','100.00'],
+        ['BL FEE','BL','1.00','35.00','0.00','35.00','35.00'],
+        ['SED','UNIT','1.00','30.00','0.00','30.00','30.00'],
+        ['SECURITY FEE','KGS','21.00','1.54','0.00','32.34','32.34'],
+        ['DELIVERY CHARGES','UNIT','1.00','12.00','0.00','12.00','12.00'],
+        ['AWB','BL','1.00','35.00','0.00','35.00','35.00']
+      ],
+      page2: [ ['SED (Si aplica)','UNIT','1.00','123.00','0.00','123.00','123.00'], ['PICKUP','UNIT','1.00','432.00','0.00','432.00','432.00'], ['BL','BL','1.00','35.00','0.00','35.00','35.00'], ['SED','UNIT','1.00','32.00','0.00','32.00','32.00'] ],
+      terms: [{title:'NOTAS EMBARQUE', text: terms.ES_LCL}]
+    };
+
+    quoteData.LCL.EN = {
+      title: 'QUOTATION COT-000014500',
+      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUMEN' },
+      values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'LCL', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Payment in 45 days', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
+      headers: ['DESCRIPTION','APLICATION','QTY','AMOUNT','MIN','MAX','TOTAL'],
+      page1: [
+        {section:'FREIGHT OF CHARGES'},
+        ['INLAND SERVICE','CNTR','1.00','43.00','0.00','0.00','43.00'],
+        ['FREIGHT SERVICES','CFT','80,741.61','2.60','230.00','0.00','209,928.19'],
+        ['FUEL SURCHARGE','CFT','80,741.61','100.00','0.33','225.00','225.00'],
+        {section:'CHARGES OF ORIGIN'},
+        ['ORIGIN CHARGES (I)','BL','1.00','100.00','0.00','100.00','100.00'],
+        ['BL','BL','1.00','35.00','0.00','35.00','35.00'],
+        ['ORIGIN CHARGES (I)','UNIT','1.00','30.00','0.00','30.00','30.00'],
+        ['SECURITY FEE','KGS','21.00','1.54','0.00','32.34','32.34'],
+        ['DELIVERY CHARGES','UNIT','1.00','12.00','0.00','12.00','12.00'],
+        ['BL','BL','1.00','35.00','0.00','35.00','35.00']
+      ],
+      page2: [ ['SED','UNIT','1.00','123.00','0.00','123.00','123.00'], ['PICK UP','UNIT','1.00','432.00','0.00','432.00','432.00'], ['BL','BL','1.00','35.00','0.00','35.00','35.00'], ['SED','UNIT','1.00','32.00','0.00','32.00','32.00'] ],
+      terms: [{title:'SHIPMENT REMARKS', text: terms.EN_LCL}]
+    };
+
+    quoteData.FCL.ES = {
+      title: 'COTIZACIÓN COT-000014508',
+      labels: { ...quoteData.AEREO.ES.labels, measure: 'VOLUMEN' },
+      values: { date: '9/2/2026', expires: '27/2/2026', customer: 'ACCIONA FORWARDING SA', executive: 'Clientes DIF', email: 'PRICING.FORWARDING@ACCION\nA.COM', agent: 'ACCIONA FORWARDING SA', address: 'Avda de Aragon 402 Edifcio Allende, 8ª\n28022 Madrid, MADRID, MADIRD, ESPAÑA', phone: '34917227800', origin: 'ESBCN', destination: 'DOSDQ', incoterm: 'EXW', measure: '68.00 M³', type: 'FCL', pieces: '1.00', transit: 'N/A', route: '', payment: 'Contado', totalLabel: 'TOTAL  :', total20: '$4,290.00', total40: '$48,325.00', total40hc: '$7,255.00' },
+      headers: ['DESCRIPCIÓN','APLICACIÓN','QTY','20FT','40FT','40FT HC'],
+      page1: [
+        {section:'CARGOS DE FLETE'},
+        ['Flete Marítimo','WM','1','$2,000.00','$24,000.00','$3,500.00'],
+        {section:'CARGOS DE ORIGEN'},
+        ['Origin Surcharge\nIncluye: Customs Fee USD 75.00/PS\n+ Port Charge USD 15.00/BL +\nHandling Fee USD 50.00/BL','LS','1','$2,000.00','$24,000.00','$3,500.00'],
+        {section:'CARGOS DE DESTINO'},
+        ['CFS','B/L','1','$75.00','$110.00','$40.00'],
+        {section:'ADUANAS'},
+        ['Gestión Aduanal','LS','1','$40.00','$40.00','$40.00'],
+        {section:'TRANSPORTE TERRESTRE'},
+        ['Transporte Terrestre','B/L','1','$75.00','$75.00','$75.00']
+      ],
+      page2: [ {section:'CARGOS DE VENTAS'}, ['Almacén Logístico','B/L','1','$100.00','$100.00','$100.00'] ],
+      terms: [{title:'NOTAS EMBARQUE', text: terms.ES_FCL}, {title:'NOTAS ADUANA', text: terms.ES_CUSTOMS_FCL}, {title:'NOTAS TRANSPORTE', text: terms.ES_TRANSPORT}]
+    };
+
+    quoteData.FCL.EN = {
+      title: 'QUOTATION COT-000014508',
+      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUMEN' },
+      values: { date: '9/2/2026', expires: '27/2/2026', customer: 'ACCIONA FORWARDING SA', executive: 'Clientes DIF', email: 'PRICING.FORWARDING@ACCION\nA.COM', agent: 'ACCIONA FORWARDING SA', address: 'Avda de Aragon 402 Edifcio Allende, 8ª\n28022 Madrid, MADRID, MADIRD, ESPAÑA', phone: '34917227800', origin: 'ESBCN', destination: 'DOSDQ', incoterm: 'EXW', measure: '68.00 M³', type: 'FCL', pieces: '1.00', transit: 'N/A', route: '', payment: 'Cash', totalLabel: 'TOTAL  :', total20: '$4,290.00', total40: '$48,325.00', total40hc: '$7,255.00' },
+      headers: ['DESCRIPTION','APLICATION','QTY','20FT','40FT','40FT HC'],
+      page1: [
+        {section:'FREIGHT OF CHARGES'},
+        ['FREIGHT SERVICES','WM','1','$2,000.00','$24,000.00','$3,500.00'],
+        {section:'CHARGES OF ORIGIN'},
+        ['Origin Surcharge\nIncluye: Customs Fee USD 75.00/PS\n+ Port Charge USD 15.00/BL +\nHandling Fee USD 50.00/BL','LS','1','$2,000.00','$24,000.00','$3,500.00'],
+        {section:'DESTINATION CHARGES'},
+        ['CFS','B/L','1','$75.00','$110.00','$40.00'],
+        {section:'CUSTOMS'},
+        ['CUSTOM CLEARENCE','LS','1','$40.00','$40.00','$40.00'],
+        {section:'LAND TRANSPORT'},
+        ['INLAND SERVICE','B/L','1','$75.00','$75.00','$75.00']
+      ],
+      page2: [ {section:'SALES CHARGES'}, ['STORAGE','B/L','1','$100.00','$100.00','$100.00'] ],
+      terms: [{title:'SHIPMENT REMARKS', text: terms.EN_FCL}, {title:'CUSTOMS REMARKS', text: terms.EN_CUSTOMS_FCL}, {title:'INLAND REMARKS', text: terms.EN_TRANSPORT}]
+    };
+
+    let currentType = 'AEREO';
+    let currentLang = 'ES';
+    let fclContainerCount = 3;
+
+    const root = document.getElementById('quoteRoot');
+    const commentBox = document.getElementById('internalComment');
+    const showComment = document.getElementById('showCommentInQuote');
+    const statusText = document.getElementById('commentStatus');
+    const fclContainerBox = document.getElementById('fclContainerBox');
+    const fclContainerSelect = document.getElementById('fclContainerCount');
+
+    function commentKey() { return `dif_quote_comment_${currentType}_${currentLang}`; }
+    function showCommentKey() { return `dif_quote_comment_visible_${currentType}_${currentLang}`; }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function nl(value) { return escapeHtml(value).replace(/\n/g, '<br>'); }
+
+    function buildFooter() {
+      return `<div class="footer">Regina Koenig No. 8, Ens. Paraíso, Santo Domingo, D.N., República Dominicana&nbsp;&nbsp; | 809-566-4333 | &nbsp;&nbsp;info@dif.com.do |<br>www.dif.com.do</div>`;
+    }
+
+    function buildHeaderLogo() {
+      return `<img class="logo" src="${LOGO_URL}" alt="DIF Servicios Logísticos" width="92" style="width:92px;height:auto;display:block;margin:0 0 10px 2px;background:transparent;border:0;object-fit:contain;">`;
+    }
+
+    function buildInfo(q) {
+      const l = q.labels, v = q.values;
+      return `
+        ${buildHeaderLogo()}
+        <div class="quote-title">${escapeHtml(q.title)}</div>
+        <div class="orange-line"></div>
+        <table class="date-table" style="table-layout:fixed;width:100%;border-collapse:collapse;"><thead><tr><th style="width:50%;text-align:center !important;vertical-align:middle;">${l.date}</th><th style="width:50%;text-align:center !important;vertical-align:middle;">${l.expires}</th></tr></thead><tbody><tr><td style="width:50%;text-align:center !important;vertical-align:middle;">${v.date}</td><td style="width:50%;text-align:center !important;vertical-align:middle;">${v.expires}</td></tr></tbody></table>
+        <div class="party-grid">
+          <table class="party-table"><tbody>
+            <tr><td class="label">${l.customer}</td><td>${nl(v.customer)}</td></tr>
+            <tr><td class="label">${l.executive}</td><td>${nl(v.executive)}</td></tr>
+            <tr><td class="label">${l.email}</td><td>${nl(v.email)}</td></tr>
+          </tbody></table>
+          <table class="party-table"><tbody>
+            <tr><td class="label">${l.agent}</td><td>${nl(v.agent)}</td></tr>
+            <tr><td class="label">${l.address}</td><td>${nl(v.address)}</td></tr>
+            <tr><td class="label">${l.phone}</td><td>${nl(v.phone)}</td></tr>
+          </tbody></table>
+        </div>
+        <div class="details-title">${l.shipmentInfo}</div>
+        <table class="details-table"><tbody>
+          ${currentType === 'FCL'
+            ? `<tr><td class="label">${l.origin}</td><td class="value">${nl(v.origin)}</td><td class="label">${l.pieces}</td><td>${nl(v.pieces)}</td></tr>
+               <tr><td class="label">${l.destination}</td><td class="value">${nl(v.destination)}</td><td class="label">${l.transit}</td><td>${nl(v.transit)}</td></tr>
+               <tr><td class="label">${l.incoterm}</td><td class="value">${nl(v.incoterm)}</td><td class="label">${l.route}</td><td>${nl(v.route)}</td></tr>
+               <tr><td class="label">${l.measure}</td><td class="value">${nl(v.measure)}</td><td class="label">${l.payment}</td><td>${nl(v.payment)}</td></tr>
+               <tr><td class="label">${l.type}</td><td class="value">${nl(v.type)}</td><td colspan="2"></td></tr>`
+            : `<tr><td class="label">${l.origin}</td><td class="value">${nl(v.origin)}</td><td class="label">${l.pieces}</td><td>${nl(v.pieces)}</td></tr>
+               <tr><td class="label">${l.destination}</td><td class="value">${nl(v.destination)}</td><td class="label">${l.transit}</td><td>${nl(v.transit)}</td></tr>
+               <tr><td class="label">${l.incoterm}</td><td class="value">${nl(v.incoterm)}</td><td class="label">${l.route}</td><td>${nl(v.route)}</td></tr>
+               <tr><td class="label">${l.measure}</td><td class="value">${nl(v.measure)}</td><td class="label">${l.payment}</td><td>${nl(v.payment)}</td></tr>
+               <tr><td class="label">${l.type}</td><td class="value">${nl(v.type)}</td><td></td><td></td></tr>`}
+        </tbody></table>`;
+    }
+
+    function getVisibleContainerCount() {
+      return currentType === 'FCL' ? Math.max(1, Math.min(3, Number(fclContainerCount) || 3)) : null;
+    }
+
+    function getVisibleHeaders(q) {
+      if (currentType !== 'FCL') return q.headers;
+      return q.headers.slice(0, 3 + getVisibleContainerCount());
+    }
+
+    function getVisibleChargeRow(row) {
+      if (row.section || currentType !== 'FCL') return row;
+      return row.slice(0, 3 + getVisibleContainerCount());
+    }
+
+    function buildChargeTable(q, rows, includeHeader) {
+      const headers = getVisibleHeaders(q);
+      const widthsByCols = {
+        4: ['40%','20%','15%','25%'],
+        5: ['34%','18%','12%','18%','18%'],
+        6: ['28%','16%','12%','17%','16%','17%'],
+        7: ['25%','13%','10%','13%','13%','13%','13%']
+      };
+      const cols = headers.length;
+      const widths = widthsByCols[cols] || Array(cols).fill((100 / cols) + '%');
+      const colgroup = `<colgroup>${widths.map(w => `<col style="width:${w}">`).join('')}</colgroup>`;
+      const header = includeHeader ? `<thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>` : '';
+      const body = rows.map(r => {
+        const row = getVisibleChargeRow(r);
+        if (row.section) return `<tr class="section"><td colspan="${cols}">${escapeHtml(row.section)}</td></tr>`;
+        return `<tr>${row.map((c,i)=>`<td class="${i===row.length-1 ? 'total-value' : ''}">${nl(c)}</td>`).join('')}</tr>`;
+      }).join('');
+      return `<table class="charges-table ${includeHeader ? '' : 'continuation'}">${colgroup}${header}<tbody>${body}</tbody></table>`;
+    }
+
+    function buildTotal(q) {
+      const v = q.values;
+      if (currentType === 'FCL') {
+        const totals = [v.total20, v.total40, v.total40hc].slice(0, getVisibleContainerCount());
+        const style = `grid-template-columns:1.65fr repeat(${totals.length},1fr);`;
+        return `<div class="total-line multi" style="${style}"><div>${escapeHtml(v.totalLabel)}</div>${totals.map(t => `<div class="amount">${escapeHtml(t)}</div>`).join('')}</div>`;
+      }
+      return `<div class="total-line"><div>${escapeHtml(v.totalLabel)}</div><div class="amount">${escapeHtml(v.totalAmount)}</div></div>`;
+    }
+
+    function buildTerms(q) {
+      const blocks = q.terms.map(t => `<div class="terms-subtitle">${escapeHtml(t.title)}</div><div class="terms-text">${escapeHtml(t.text)}</div>`).join('<br><br>');
+      const comment = localStorage.getItem(commentKey()) || '';
+      return `<div class="terms-title">${escapeHtml(q.labels.terms)}</div><div class="terms-block">${blocks}</div><div class="internal-comment-print"><strong>${escapeHtml(q.labels.internalComment)}</strong>${nl(comment)}</div>`;
+    }
+
+    function getAllChargeRows(q) {
+      return [...q.page1, ...q.page2];
+    }
+
+    function buildChargeRowHtml(row, cols) {
+      const visibleRow = getVisibleChargeRow(row);
+      if (visibleRow.section) {
+        return `<tr class="section" data-section="${escapeHtml(visibleRow.section)}"><td colspan="${cols}">${escapeHtml(visibleRow.section)}</td></tr>`;
+      }
+
+      return `<tr>${visibleRow.map((c, i) => `<td class="${i === visibleRow.length - 1 ? 'total-value' : ''}">${nl(c)}</td>`).join('')}</tr>`;
+    }
+
+    function createPageShell(extraClass = '') {
+      const page = document.createElement('section');
+      page.className = `quote-page ${extraClass}`.trim();
+
+      const main = document.createElement('div');
+      main.className = 'page-main';
+      page.appendChild(main);
+      page.insertAdjacentHTML('beforeend', buildFooter());
+
+      return { page, main };
+    }
+
+    function createChargePage(q, isFirstPage) {
+      const shell = createPageShell(isFirstPage ? 'page-1' : 'page-continuation');
+      shell.main.innerHTML = isFirstPage ? buildInfo(q) : buildHeaderLogo();
+
+      const tableHtml = buildChargeTable(q, [], isFirstPage);
+      const holder = document.createElement('div');
+      holder.className = 'charges-zone';
+      holder.innerHTML = tableHtml;
+      shell.main.appendChild(holder);
+
+      return {
+        page: shell.page,
+        main: shell.main,
+        table: holder.querySelector('table'),
+        tbody: holder.querySelector('tbody')
+      };
+    }
+
+    function pageOverflows(page) {
+      return page.scrollHeight > page.clientHeight + 1;
+    }
+
+    function appendChargeRow(state, q, row) {
+      state.tbody.insertAdjacentHTML('beforeend', buildChargeRowHtml(row, getVisibleHeaders(q).length));
+    }
+
+    function removeLastRow(state) {
+      const last = state.tbody.lastElementChild;
+      if (last) last.remove();
+    }
+
+    function moveTrailingSectionIfNeeded(state) {
+      const last = state.tbody.lastElementChild;
+      if (!last || !last.classList.contains('section')) return null;
+
+      const sectionName = last.getAttribute('data-section') || last.textContent.trim();
+      last.remove();
+      return { section: sectionName };
+    }
+
+    function createTermsPage(q) {
+      const shell = createPageShell('page-terms');
+      shell.main.innerHTML = buildHeaderLogo();
+      return shell;
+    }
+
+    function createAfterChargesContainer(state) {
+      let after = state.main.querySelector('.after-charges');
+      if (!after) {
+        after = document.createElement('div');
+        after.className = 'after-charges';
+        state.main.appendChild(after);
+      }
+      return after;
+    }
+
+    function ensureTermsBlock(state) {
+      let block = state.main.querySelector('.terms-block');
+      if (!block) {
+        block = document.createElement('div');
+        block.className = 'terms-block';
+        state.main.appendChild(block);
+      }
+      return block;
+    }
+
+    function createNewTermsState(q) {
+      const shell = createTermsPage(q);
+      root.appendChild(shell.page);
+      return { page: shell.page, main: shell.main };
+    }
+
+    function appendNodeWithPageBreak(state, node, q) {
+      state.main.appendChild(node);
+
+      if (!pageOverflows(state.page)) return state;
+
+      node.remove();
+      state = createNewTermsState(q);
+      state.main.appendChild(node);
+
+      return state;
+    }
+
+    function normalizeTermLines(text) {
+      return String(text || '')
+        .replace(/\r/g, '')
+        .split('\n')
+        .map(x => x.trim())
+        .filter(Boolean);
+    }
+
+    function appendTermsPaginated(state, q) {
+      let after = createAfterChargesContainer(state);
+      const total = document.createElement('div');
+      total.innerHTML = buildTotal(q);
+      after.appendChild(total.firstElementChild);
+
+      if (pageOverflows(state.page)) {
+        after.innerHTML = '';
+        state = createNewTermsState(q);
+        after = createAfterChargesContainer(state);
+        const total2 = document.createElement('div');
+        total2.innerHTML = buildTotal(q);
+        after.appendChild(total2.firstElementChild);
+      }
+
+      const termsTitle = document.createElement('div');
+      termsTitle.className = 'terms-title';
+      termsTitle.textContent = q.labels.terms;
+      state = appendNodeWithPageBreak(state, termsTitle, q);
+
+      let block = ensureTermsBlock(state);
+
+      for (const section of q.terms) {
+        const subtitle = document.createElement('div');
+        subtitle.className = 'terms-subtitle';
+        subtitle.textContent = section.title;
+        block.appendChild(subtitle);
+
+        if (pageOverflows(state.page)) {
+          subtitle.remove();
+          state = createNewTermsState(q);
+          block = ensureTermsBlock(state);
+          block.appendChild(subtitle);
+        }
+
+        for (const lineText of normalizeTermLines(section.text)) {
+          const line = document.createElement('div');
+          line.className = 'terms-line';
+          line.textContent = lineText;
+          block.appendChild(line);
+
+          if (pageOverflows(state.page)) {
+            line.remove();
+            state = createNewTermsState(q);
+            block = ensureTermsBlock(state);
+
+            const cont = document.createElement('div');
+            cont.className = 'terms-subtitle';
+            cont.textContent = section.title;
+            block.appendChild(cont);
+
+            block.appendChild(line);
+          }
+        }
+      }
+
+      const comment = localStorage.getItem(commentKey()) || '';
+      if (comment && localStorage.getItem(showCommentKey()) === '1') {
+        const commentNode = document.createElement('div');
+        commentNode.className = 'internal-comment-print';
+        commentNode.innerHTML = `<strong>${escapeHtml(q.labels.internalComment)}</strong>${nl(comment)}`;
+        state = appendNodeWithPageBreak(state, commentNode, q);
+      }
+    }
+
+    function getPowerAutomateCss() {
+      return `
+        :root{--dif-blue:#005baa;--dif-blue-2:#1468ad;--dif-orange:#f7941d;--line:#cfcfcf;--label-bg:#f0f2f5;}
+        body{margin:0;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;}
+        .quote-page{width:816px;height:1056px;background:#fff;margin:0 auto 18px auto;padding:18px 24px 14px 24px;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;}
+        .page-main{display:block;flex:0 0 auto;}
+        .logo{width:92px;height:auto;display:block;margin:0 0 10px 2px;background:transparent;border:0;object-fit:contain;}
+        .quote-title{text-align:center;color:#005baa;font-size:21px;font-weight:700;margin:6px 0 28px 0;line-height:1;}
+        .orange-line{border-top:2px solid #f7941d;margin:0 0 12px 0;}
+        table{border-collapse:collapse;width:100%;}
+        .date-table{table-layout:fixed;}
+        .date-table th{width:50%;background:#1468ad;color:#fff;font-size:16px;line-height:1;height:20px;padding:3px 8px;text-align:center !important;font-weight:700;vertical-align:middle;}
+        .date-table td{width:50%;height:24px;text-align:center !important;font-size:14px;padding:4px 8px 6px;border-bottom:1px solid #cfcfcf;vertical-align:middle;}
+        .party-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:34px;margin-top:16px;}
+        .party-table td{vertical-align:middle;height:34px;font-size:13px;padding:5px 7px;}
+        .party-table .label{width:165px;background:#f0f2f5;color:#005baa;font-weight:700;font-size:14px;}
+        .details-title{margin-top:14px;background:#1468ad;color:#fff;text-align:center;height:20px;line-height:20px;font-weight:700;font-size:16px;}
+        .details-table td{border:1px solid #cfcfcf;height:29px;font-size:12.5px;padding:4px 7px;vertical-align:middle;}
+        .details-table .label{width:135px;background:#f0f2f5;color:#005baa;font-weight:700;font-size:14px;}
+        .details-table .value{width:240px;}
+        .charges-table{margin-top:22px;color:#005baa;table-layout:fixed;}
+        .charges-table thead th{background:#1468ad;color:#fff;height:30px;padding:5px 5px;font-size:13px;font-weight:700;text-align:right;}
+        .charges-table thead th:first-child{text-align:left;}
+        .charges-table td{height:24px;padding:4px 5px;font-size:12px;vertical-align:middle;text-align:right;line-height:1.1;}
+        .charges-table td:first-child{text-align:left;}
+        .charges-table .section td{height:26px;padding-top:7px;color:#005baa;font-size:17px;line-height:1;text-align:left;font-weight:700;border-bottom:2px solid #005baa;}
+        .charges-table .total-value{font-weight:700;}
+        .charges-table.continuation{margin-top:34px;}
+        .charges-table.continuation td{font-size:14px;height:30px;}
+        .charges-table.continuation .section td{font-size:18px;height:32px;}
+        .total-line{margin-top:44px;border-top:2px solid #005baa;display:grid;grid-template-columns:1fr 1fr;align-items:center;color:#005baa;font-size:16px;font-weight:700;padding:10px 8px 0 8px;min-height:34px;}
+        .total-line .amount{text-align:right;}
+        .total-line.multi{grid-template-columns:1.65fr 1fr 1fr 1fr;column-gap:8px;}
+        .terms-title{margin-top:34px;height:28px;line-height:28px;text-align:center;background:#1468ad;color:#fff;font-size:16px;font-weight:700;}
+        .terms-block{color:#005baa;font-size:12px;line-height:1.06;padding:10px 6px 0 6px;}
+        .terms-subtitle{font-weight:700;margin:6px 0 7px 0;font-size:13px;color:#005baa;}
+        .terms-line{margin:0 0 1px 0;color:#005baa;font-size:12px;line-height:1.06;}
+        .footer{border-top:2px solid #005baa;color:#536271;text-align:center;font-size:9.5px;line-height:1.5;padding-top:4px;margin-top:auto;}
+        .internal-comment-print{display:block;color:#005baa;border:1px solid #005baa;margin-top:18px;padding:8px 10px;font-size:12px;white-space:pre-line;}
+      `;
+    }
+
+
+    function beautifyHtml(source) {
+      const voidTags = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+      const normalized = String(source || '')
+        .replace(/>\s+</g, '><')
+        .replace(/</g, '\n<')
+        .split('\n')
+        .map(x => x.trim())
+        .filter(Boolean);
+
+      let indent = 0;
+      const lines = [];
+
+      for (const token of normalized) {
+        const closing = /^<\//.test(token);
+        const comment = /^<!--/.test(token);
+        const tagMatch = token.match(/^<\/?\s*([a-zA-Z0-9:-]+)/);
+        const tag = tagMatch ? tagMatch[1].toLowerCase() : '';
+        const selfClosing = /\/?>$/.test(token) && (token.endsWith('/>') || voidTags.has(tag));
+        const singleLine = /^<[^>]+>.*<\/[^>]+>$/.test(token);
+
+        if (closing) indent = Math.max(indent - 1, 0);
+        lines.push(`${'  '.repeat(indent)}${token}`);
+
+        if (!closing && !selfClosing && !singleLine && !comment && tag && !/^<!/.test(token)) {
+          indent += 1;
+        }
+      }
+
+      return lines.join('\n');
+    }
+
+    function buildPowerAutomateEmailHtml() {
+      const html = `<style>
+${getPowerAutomateCss().trim()}
+</style>
+<div class="${escapeHtml(root.className || '')}">
+${root.innerHTML}
+</div>`;
+      return beautifyHtml(html);
+    }
+
+    function renderQuote() {
+      const q = quoteData[currentType][currentLang];
+      const commentVisible = localStorage.getItem(showCommentKey()) === '1';
+      root.className = commentVisible ? 'show-comment' : '';
+      root.innerHTML = '';
+
+      let state = createChargePage(q, true);
+      root.appendChild(state.page);
+
+      const rows = getAllChargeRows(q);
+
+      for (const row of rows) {
+        appendChargeRow(state, q, row);
+
+        if (pageOverflows(state.page)) {
+          removeLastRow(state);
+
+          let carrySection = null;
+          if (!row.section) {
+            carrySection = moveTrailingSectionIfNeeded(state);
+          }
+
+          state = createChargePage(q, false);
+          root.appendChild(state.page);
+
+          if (carrySection) appendChargeRow(state, q, carrySection);
+          appendChargeRow(state, q, row);
+
+          if (pageOverflows(state.page)) {
+            console.warn('Una fila individual excede el espacio disponible de la página:', row);
+          }
+        }
+      }
+
+      appendTermsPaginated(state, q);
+
+      document.querySelectorAll('#typeButtons button').forEach(btn => btn.classList.toggle('active', btn.dataset.type === currentType));
+      document.querySelectorAll('input[name="lang"]').forEach(r => r.checked = r.value === currentLang);
+      fclContainerBox.classList.toggle('visible', currentType === 'FCL');
+      fclContainerSelect.value = String(fclContainerCount);
+      commentBox.value = localStorage.getItem(commentKey()) || '';
+      showComment.checked = commentVisible;
+      statusText.textContent = 'Comentario cargado para ' + currentType + ' / ' + (currentLang === 'ES' ? 'Español' : 'English') + '.';
+    }
+
+    document.getElementById('typeButtons').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-type]');
+      if (!btn) return;
+      currentType = btn.dataset.type;
+      renderQuote();
+    });
+
+    fclContainerSelect.addEventListener('change', e => {
+      fclContainerCount = Number(e.target.value) || 3;
+      renderQuote();
+    });
+
+    document.querySelectorAll('input[name="lang"]').forEach(radio => {
+      radio.addEventListener('change', e => {
+        currentLang = e.target.value;
+        renderQuote();
+      });
+    });
+
+    commentBox.addEventListener('input', () => {
+      localStorage.setItem(commentKey(), commentBox.value);
+      renderQuote();
+      commentBox.focus();
+      commentBox.selectionStart = commentBox.selectionEnd = commentBox.value.length;
+      statusText.textContent = 'Comentario guardado localmente.';
+    });
+
+    showComment.addEventListener('change', () => {
+      localStorage.setItem(showCommentKey(), showComment.checked ? '1' : '0');
+      renderQuote();
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const html = buildPowerAutomateEmailHtml();
+      try {
+        await navigator.clipboard.writeText(html);
+        statusText.textContent = 'HTML embellecido listo para Send Email V2 copiado al portapapeles.';
+      } catch (err) {
+        statusText.textContent = 'No se pudo copiar automáticamente. Selecciona manualmente el HTML desde el inspector.';
+      }
+    });
+
+    renderQuote();
+  </script>
+</body>
+</html>
