@@ -1,10 +1,8 @@
-DIF Cotizaciones Web v7
+DIF Cotizaciones Web v8
 
-Cambios v7:
-- Comentarios sincronizados con SharePoint usando Power Automate.
-- La llamada al flujo usa Content-Type text/plain para evitar preflight CORS.
-- El comentario se carga automáticamente al cambiar tipo de cotización o idioma.
-- El comentario se guarda con el botón "Guardar comentario".
-- El HTML copiado para Send Email V2 sigue sin incluir controles de la web.
+Cambios v8:
+- Después de guardar/enviar un comentario mediante Power Automate, la caja de comentario se limpia automáticamente.
+- El comentario sí queda guardado en SharePoint y se envía por correo.
+- La limpieza es solo visual/local después del envío; al recargar o cambiar de cotización, la web vuelve a consultar SharePoint.
 
-Nota: la URL firmada del flujo queda visible si el repositorio de GitHub Pages es público.
+Abrir index.html en el navegador o subir este folder a GitHub Pages.

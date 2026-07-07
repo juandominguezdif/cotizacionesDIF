@@ -1172,8 +1172,10 @@ ${root.innerHTML}
           token: COMMENTS_TOKEN
         });
 
-        statusText.textContent = data.message || 'Comentario guardado correctamente en SharePoint.';
+        currentComment = '';
+        commentBox.value = '';
         renderQuote();
+        statusText.textContent = (data.message || 'Comentario guardado correctamente en SharePoint.') + ' Caja de comentario limpiada.';
       } catch (err) {
         console.error(err);
         statusText.textContent = 'No se pudo guardar el comentario. Revisa Power Automate o SharePoint.';
