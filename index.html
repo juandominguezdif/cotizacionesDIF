@@ -128,6 +128,10 @@
 
     .comment-options {
       margin-top: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .status-text {
@@ -472,11 +476,12 @@
 
     <section class="comments-panel">
       <p class="toolbar-title">Comentario interno de control</p>
-      <textarea id="internalComment" placeholder="Escribe aquí un comentario para esta combinación de tipo e idioma. Se guarda localmente en este navegador."></textarea>
+      <textarea id="internalComment" placeholder="Escribe aquí un comentario para esta cotización, tipo e idioma. Se guarda en SharePoint mediante Power Automate."></textarea>
       <div class="comment-options">
+        <button class="action-button primary" id="saveCommentBtn" type="button">Guardar comentario</button>
         <label><input type="checkbox" id="showCommentInQuote"> Mostrar comentario dentro de la cotización</label>
       </div>
-      <div class="status-text" id="commentStatus">Sincronizado localmente.</div>
+      <div class="status-text" id="commentStatus">Pendiente de sincronizar con Power Automate.</div>
     </section>
 
     <main id="quoteRoot"></main>
@@ -484,6 +489,8 @@
 
   <script>
     const LOGO_URL = 'https://dif.com.do/img/dif.png';
+    const POWER_AUTOMATE_COMMENTS_URL = 'https://48f0fcb04df7e0b687051ce009ac53.03.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3e059c56be694532bc45ac7d854c951b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bNTv8KYGPEFyj4tpW9_E1al-dR3h8nOpeKZxAJWwjBA';
+    const COMMENTS_TOKEN = 'dif-cotizaciones-2026';
 
     const termsCatalog = {
       "Aduana / Aéreo": {
@@ -699,6 +706,10 @@
     const statusText = document.getElementById('commentStatus');
     const fclContainerBox = document.getElementById('fclContainerBox');
     const fclContainerSelect = document.getElementById('fclContainerCount');
+    const saveCommentBtn = document.getElementById('saveCommentBtn');
+
+    let currentComment = '';
+    let commentRequestVersion = 0;
 
     function commentKey() { return `dif_quote_comment_${currentType}_${currentLang}`; }
     function showCommentKey() { return `dif_quote_comment_visible_${currentType}_${currentLang}`; }
@@ -798,7 +809,7 @@
 
     function buildTerms(q) {
       const blocks = q.terms.map(t => `<div class="terms-subtitle">${escapeHtml(t.title)}</div><div class="terms-text">${escapeHtml(t.text)}</div>`).join('<br><br>');
-      const comment = localStorage.getItem(commentKey()) || '';
+      const comment = commentBox ? commentBox.value : currentComment;
       return `<div class="terms-title">${escapeHtml(q.labels.terms)}</div><div class="terms-block">${blocks}</div><div class="internal-comment-print"><strong>${escapeHtml(q.labels.internalComment)}</strong>${nl(comment)}</div>`;
     }
 
@@ -1068,6 +1079,111 @@ ${root.innerHTML}
       return beautifyHtml(html);
     }
 
+
+    function getCurrentQuoteNumber() {
+      const q = quoteData[currentType][currentLang];
+      const match = String(q.title || '').match(/COT-\d+/i);
+      return match ? match[0].toUpperCase() : String(q.title || '').trim();
+    }
+
+    function getCurrentCommentIdentity() {
+      return `${getCurrentQuoteNumber()}|${currentType}|${currentLang}`;
+    }
+
+    async function callCommentsApi(payload) {
+      const response = await fetch(POWER_AUTOMATE_COMMENTS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await response.text();
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (err) {
+        throw new Error('Power Automate devolvió una respuesta no JSON: ' + text);
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.message || 'Power Automate no pudo procesar la solicitud.');
+      }
+
+      return data;
+    }
+
+    async function loadCommentFromPowerAutomate() {
+      const requestVersion = ++commentRequestVersion;
+      const identity = getCurrentCommentIdentity();
+
+      statusText.textContent = `Cargando comentario ${identity}...`;
+      commentBox.disabled = true;
+      saveCommentBtn.disabled = true;
+
+      try {
+        const data = await callCommentsApi({
+          accion: 'get',
+          numeroCotizacion: getCurrentQuoteNumber(),
+          tipoCotizacion: currentType,
+          idioma: currentLang,
+          token: COMMENTS_TOKEN
+        });
+
+        if (requestVersion !== commentRequestVersion || identity !== getCurrentCommentIdentity()) return;
+
+        currentComment = data.comentario || '';
+        commentBox.value = currentComment;
+        renderQuote();
+
+        const metadata = data.actualizadoPor
+          ? ` Última actualización: ${data.actualizadoPor}${data.fechaActualizacion ? ' - ' + data.fechaActualizacion : ''}.`
+          : '';
+
+        statusText.textContent = `Comentario sincronizado desde SharePoint.${metadata}`;
+      } catch (err) {
+        if (requestVersion !== commentRequestVersion) return;
+        console.error(err);
+        statusText.textContent = 'No se pudo cargar el comentario desde Power Automate. Revisa el flujo o la conexión.';
+      } finally {
+        if (requestVersion === commentRequestVersion) {
+          commentBox.disabled = false;
+          saveCommentBtn.disabled = false;
+        }
+      }
+    }
+
+    async function saveCommentToPowerAutomate() {
+      const identity = getCurrentCommentIdentity();
+      currentComment = commentBox.value;
+
+      statusText.textContent = `Guardando comentario ${identity}...`;
+      saveCommentBtn.disabled = true;
+      commentBox.disabled = true;
+
+      try {
+        const data = await callCommentsApi({
+          accion: 'save',
+          numeroCotizacion: getCurrentQuoteNumber(),
+          tipoCotizacion: currentType,
+          idioma: currentLang,
+          comentario: currentComment,
+          usuario: 'IT Team',
+          token: COMMENTS_TOKEN
+        });
+
+        statusText.textContent = data.message || 'Comentario guardado correctamente en SharePoint.';
+        renderQuote();
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = 'No se pudo guardar el comentario. Revisa Power Automate o SharePoint.';
+      } finally {
+        saveCommentBtn.disabled = false;
+        commentBox.disabled = false;
+        commentBox.focus();
+      }
+    }
+
     function renderQuote() {
       const q = quoteData[currentType][currentLang];
       const commentVisible = localStorage.getItem(showCommentKey()) === '1';
@@ -1108,16 +1224,17 @@ ${root.innerHTML}
       document.querySelectorAll('input[name="lang"]').forEach(r => r.checked = r.value === currentLang);
       fclContainerBox.classList.toggle('visible', currentType === 'FCL');
       fclContainerSelect.value = String(fclContainerCount);
-      commentBox.value = localStorage.getItem(commentKey()) || '';
+      commentBox.value = currentComment;
       showComment.checked = commentVisible;
-      statusText.textContent = 'Comentario cargado para ' + currentType + ' / ' + (currentLang === 'ES' ? 'Español' : 'English') + '.';
     }
 
     document.getElementById('typeButtons').addEventListener('click', e => {
       const btn = e.target.closest('button[data-type]');
       if (!btn) return;
       currentType = btn.dataset.type;
+      currentComment = '';
       renderQuote();
+      loadCommentFromPowerAutomate();
     });
 
     fclContainerSelect.addEventListener('change', e => {
@@ -1128,16 +1245,22 @@ ${root.innerHTML}
     document.querySelectorAll('input[name="lang"]').forEach(radio => {
       radio.addEventListener('change', e => {
         currentLang = e.target.value;
+        currentComment = '';
         renderQuote();
+        loadCommentFromPowerAutomate();
       });
     });
 
     commentBox.addEventListener('input', () => {
-      localStorage.setItem(commentKey(), commentBox.value);
+      currentComment = commentBox.value;
       renderQuote();
       commentBox.focus();
       commentBox.selectionStart = commentBox.selectionEnd = commentBox.value.length;
-      statusText.textContent = 'Comentario guardado localmente.';
+      statusText.textContent = 'Comentario modificado localmente. Presiona Guardar comentario para sincronizarlo.';
+    });
+
+    saveCommentBtn.addEventListener('click', () => {
+      saveCommentToPowerAutomate();
     });
 
     showComment.addEventListener('change', () => {
@@ -1158,6 +1281,7 @@ ${root.innerHTML}
     });
 
     renderQuote();
+    loadCommentFromPowerAutomate();
   </script>
 </body>
 </html>
