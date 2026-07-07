@@ -476,12 +476,12 @@
 
     <section class="comments-panel">
       <p class="toolbar-title">Comentario interno de control</p>
-      <textarea id="internalComment" placeholder="Escribe aquí un comentario para esta cotización, tipo e idioma. Se guarda en SharePoint mediante Power Automate."></textarea>
+      <textarea id="internalComment" placeholder="Escribe aquí un comentario para enviar por Power Automate. Después de enviarlo, la caja se limpia."></textarea>
       <div class="comment-options">
         <button class="action-button primary" id="saveCommentBtn" type="button">Guardar comentario</button>
         <label><input type="checkbox" id="showCommentInQuote"> Mostrar comentario dentro de la cotización</label>
       </div>
-      <div class="status-text" id="commentStatus">Pendiente de sincronizar con Power Automate.</div>
+      <div class="status-text" id="commentStatus">Listo para escribir un comentario nuevo.</div>
     </section>
 
     <main id="quoteRoot"></main>
@@ -1235,8 +1235,9 @@ ${root.innerHTML}
       if (!btn) return;
       currentType = btn.dataset.type;
       currentComment = '';
+      commentBox.value = '';
       renderQuote();
-      loadCommentFromPowerAutomate();
+      statusText.textContent = 'Listo para escribir un comentario nuevo.';
     });
 
     fclContainerSelect.addEventListener('change', e => {
@@ -1249,8 +1250,7 @@ ${root.innerHTML}
         currentLang = e.target.value;
         currentComment = '';
         renderQuote();
-        loadCommentFromPowerAutomate();
-      });
+        });
     });
 
     commentBox.addEventListener('input', () => {
