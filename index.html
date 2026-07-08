@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DIF - Cotizaciones</title>
+  <title>DIF - Cotizaciones v13</title>
   <style>
     :root {
       --dif-blue: #005baa;
@@ -734,20 +734,56 @@
     }
 
     @media print {
-      body { background: #fff; }
-      .app-shell { padding: 0; max-width: none; display:block; }
-      .toolbar, .format-panel, .comments-panel, .control-sidebar { display: none !important; }
-      .quote-page {
-        width: 8.5in;
-        min-height: 11in;
-        height: 11in;
-        margin: 0;
-        box-shadow: none;
-        page-break-after: always;
-        break-after: page;
-      }
-      .quote-page:last-child { page-break-after: auto; break-after: auto; }
       @page { size: Letter; margin: 0; }
+
+      html,
+      body {
+        width: 8.5in !important;
+        min-height: 11in !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
+      }
+
+      .app-shell,
+      .app-shell.workspace,
+      .quote-canvas,
+      #quoteRoot {
+        display: block !important;
+        width: 8.5in !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .toolbar,
+      .format-panel,
+      .comments-panel,
+      .control-sidebar {
+        display: none !important;
+      }
+
+      .quote-page {
+        width: 8.5in !important;
+        height: 10.82in !important;
+        min-height: 10.82in !important;
+        max-height: 10.82in !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid-page !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+
+      .quote-page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
     }
   </style>
 </head>
@@ -805,15 +841,15 @@
       <div class="format-group">
         <p class="format-group-title">Tamaños de texto</p>
         <div class="format-controls">
-          <div class="format-field"><label for="fmtTitleSize">Título principal <output id="fmtTitleSizeValue">21px</output></label><input type="range" id="fmtTitleSize" min="16" max="30" step="1"></div>
-          <div class="format-field"><label for="fmtSectionTitleSize">Barras / subtítulos <output id="fmtSectionTitleSizeValue">16px</output></label><input type="range" id="fmtSectionTitleSize" min="12" max="22" step="1"></div>
-          <div class="format-field"><label for="fmtLabelSize">Etiquetas <output id="fmtLabelSizeValue">14px</output></label><input type="range" id="fmtLabelSize" min="10" max="18" step="1"></div>
-          <div class="format-field"><label for="fmtBodySize">Datos cliente/detalle <output id="fmtBodySizeValue">13px</output></label><input type="range" id="fmtBodySize" min="10" max="18" step="1"></div>
-          <div class="format-field"><label for="fmtDateSize">Fechas <output id="fmtDateSizeValue">14px</output></label><input type="range" id="fmtDateSize" min="10" max="18" step="1"></div>
+          <div class="format-field"><label for="fmtTitleSize">Título principal <output id="fmtTitleSizeValue">21px</output></label><input type="range" id="fmtTitleSize" min="16" max="26" step="1"></div>
+          <div class="format-field"><label for="fmtSectionTitleSize">Barras / subtítulos <output id="fmtSectionTitleSizeValue">16px</output></label><input type="range" id="fmtSectionTitleSize" min="12" max="20" step="1"></div>
+          <div class="format-field"><label for="fmtLabelSize">Etiquetas <output id="fmtLabelSizeValue">14px</output></label><input type="range" id="fmtLabelSize" min="10" max="17" step="1"></div>
+          <div class="format-field"><label for="fmtBodySize">Datos cliente/detalle <output id="fmtBodySizeValue">13px</output></label><input type="range" id="fmtBodySize" min="10" max="17" step="1"></div>
+          <div class="format-field"><label for="fmtDateSize">Fechas <output id="fmtDateSizeValue">14px</output></label><input type="range" id="fmtDateSize" min="10" max="17" step="1"></div>
           <div class="format-field"><label for="fmtTableHeaderSize">Cabecera cargos <output id="fmtTableHeaderSizeValue">13px</output></label><input type="range" id="fmtTableHeaderSize" min="9" max="17" step="1"></div>
           <div class="format-field"><label for="fmtTableSize">Tabla de cargos <output id="fmtTableSizeValue">12px</output></label><input type="range" id="fmtTableSize" min="8" max="16" step="1"></div>
           <div class="format-field"><label for="fmtTermsSize">Términos <output id="fmtTermsSizeValue">12px</output></label><input type="range" id="fmtTermsSize" min="8" max="15" step="1"></div>
-          <div class="format-field"><label for="fmtFooterSize">Pie de página <output id="fmtFooterSizeValue">9.5px</output></label><input type="range" id="fmtFooterSize" min="7" max="12" step="0.5"></div>
+          <div class="format-field"><label for="fmtFooterSize">Pie de página <output id="fmtFooterSizeValue">9.5px</output></label><input type="range" id="fmtFooterSize" min="7" max="11" step="0.5"></div>
         </div>
       </div>
 
@@ -851,7 +887,7 @@
         <button class="action-button" id="resetFormatBtn" type="button">Restaurar</button>
         <span class="status-text" id="formatStatus">Los cambios se ven en tiempo real. Guarda para sincronizar globalmente.</span>
       </div>
-      <div class="format-note">El formato guardado se sincroniza en SharePoint vía Power Automate y se aplica a cualquier navegador que abra esta web.</div>
+      <div class="format-note">El formato guardado se sincroniza en SharePoint vía Power Automate y se aplica a cualquier navegador que abra esta web. La impresión usa paginación segura para evitar páginas en blanco.</div>
     </section>
 
     <section class="comments-panel">
@@ -1168,9 +1204,26 @@
       footerLineThickness: { input: document.getElementById('fmtFooterLineThickness'), output: document.getElementById('fmtFooterLineThicknessValue'), cssVar: '--fmt-footer-line-thickness', unit: 'px' }
     };
 
+    const formatLimits = {
+      titleSize: [16, 26],
+      sectionTitleSize: [12, 20],
+      labelSize: [10, 17],
+      bodySize: [10, 17],
+      dateSize: [10, 17],
+      tableHeaderSize: [9, 16],
+      tableSize: [8, 15],
+      termsSize: [7, 14],
+      footerSize: [7, 11],
+      totalMarginTop: [12, 56],
+      termsMarginTop: [8, 50]
+    };
+
     let currentFormatSettings = { ...defaultFormatSettings };
     let currentComment = '';
     let commentRequestVersion = 0;
+    let isPreparingPrint = false;
+    const SCREEN_OVERFLOW_BUFFER = 32;
+    const PRINT_OVERFLOW_BUFFER = 82;
 
     function commentKey() { return `dif_quote_comment_${currentType}_${currentLang}`; }
     function showCommentKey() { return `dif_quote_comment_visible_${currentType}_${currentLang}`; }
@@ -1318,7 +1371,18 @@
     }
 
     function pageOverflows(page) {
-      return page.scrollHeight > page.clientHeight + 1;
+      const buffer = isPreparingPrint ? PRINT_OVERFLOW_BUFFER : SCREEN_OVERFLOW_BUFFER;
+      const pageHeight = page.clientHeight || page.getBoundingClientRect().height;
+      const main = page.querySelector('.page-main');
+      const footer = page.querySelector('.footer');
+      const mainHeight = main ? main.getBoundingClientRect().height : 0;
+      const footerHeight = footer ? footer.getBoundingClientRect().height : 0;
+      const styles = getComputedStyle(page);
+      const padTop = parseFloat(styles.paddingTop) || 0;
+      const padBottom = parseFloat(styles.paddingBottom) || 0;
+      const measuredHeight = mainHeight + footerHeight + padTop + padBottom;
+
+      return Math.max(page.scrollHeight, measuredHeight) > (pageHeight - buffer);
     }
 
     function appendChargeRow(state, q, row) {
@@ -1557,7 +1621,12 @@ ${root.innerHTML}
           normalized[key] = isColorValue(value) ? value : fallback;
         } else {
           const numberValue = Number(value);
-          normalized[key] = Number.isFinite(numberValue) ? numberValue : fallback;
+          let nextValue = Number.isFinite(numberValue) ? numberValue : fallback;
+          if (formatLimits[key]) {
+            const [min, max] = formatLimits[key];
+            nextValue = Math.min(max, Math.max(min, nextValue));
+          }
+          normalized[key] = nextValue;
         }
       });
       return normalized;
@@ -1814,6 +1883,11 @@ ${root.innerHTML}
       }
     }
 
+    function prepareQuoteForPrintMode(enabled) {
+      isPreparingPrint = enabled;
+      renderQuote();
+    }
+
     function renderQuote() {
       const q = quoteData[currentType][currentLang];
       const commentVisible = localStorage.getItem(showCommentKey()) === '1';
@@ -1900,7 +1974,19 @@ ${root.innerHTML}
       renderQuote();
     });
 
-    document.getElementById('printBtn').addEventListener('click', () => window.print());
+    document.getElementById('printBtn').addEventListener('click', () => {
+      prepareQuoteForPrintMode(true);
+      setTimeout(() => window.print(), 120);
+    });
+
+    window.addEventListener('beforeprint', () => {
+      prepareQuoteForPrintMode(true);
+    });
+
+    window.addEventListener('afterprint', () => {
+      prepareQuoteForPrintMode(false);
+      statusText.textContent = 'Listo para escribir un comentario nuevo.';
+    });
 
     document.getElementById('copyBtn').addEventListener('click', async () => {
       const html = buildPowerAutomateEmailHtml();
