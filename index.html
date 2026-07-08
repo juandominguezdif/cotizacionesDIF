@@ -13,6 +13,41 @@
       --label-bg: #f0f2f5;
       --page-w: 816px;
       --page-h: 1056px;
+
+      --fmt-primary-color: #005baa;
+      --fmt-header-bg: #1468ad;
+      --fmt-accent-color: #f7941d;
+      --fmt-line-color: #cfcfcf;
+      --fmt-label-bg: #f0f2f5;
+      --fmt-page-bg: #ffffff;
+      --fmt-title-size: 21px;
+      --fmt-section-title-size: 16px;
+      --fmt-label-size: 14px;
+      --fmt-body-size: 13px;
+      --fmt-date-size: 14px;
+      --fmt-table-header-size: 13px;
+      --fmt-table-size: 12px;
+      --fmt-terms-size: 12px;
+      --fmt-footer-size: 9.5px;
+      --fmt-logo-width: 92px;
+      --fmt-logo-bottom: 10px;
+      --fmt-title-top: 6px;
+      --fmt-title-bottom: 28px;
+      --fmt-page-pad-top: 18px;
+      --fmt-page-pad-x: 24px;
+      --fmt-page-pad-bottom: 14px;
+      --fmt-party-row-height: 34px;
+      --fmt-detail-row-height: 29px;
+      --fmt-charge-row-height: 24px;
+      --fmt-charge-header-height: 30px;
+      --fmt-charge-section-height: 26px;
+      --fmt-charges-margin-top: 22px;
+      --fmt-details-margin-top: 14px;
+      --fmt-total-margin-top: 44px;
+      --fmt-terms-margin-top: 34px;
+      --fmt-terms-line-height: 1.06;
+      --fmt-line-thickness: 2px;
+      --fmt-footer-line-thickness: 2px;
     }
 
     * { box-sizing: border-box; }
@@ -415,6 +450,281 @@
 
     .hidden { display: none; }
 
+
+    /* ===== Layout izquierda / cotización derecha ===== */
+    .app-shell.workspace {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 380px minmax(840px, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .control-sidebar {
+      position: sticky;
+      top: 12px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .quote-canvas {
+      min-width: 0;
+      overflow-x: auto;
+      padding-bottom: 24px;
+    }
+
+    .toolbar-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .toolbar,
+    .format-panel,
+    .comments-panel {
+      margin-bottom: 12px;
+    }
+
+    .format-panel {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+
+    .format-panel-header,
+    .format-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .format-panel-header { margin-bottom: 10px; }
+
+    .format-toggle {
+      border: 1px solid var(--dif-blue);
+      color: var(--dif-blue);
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .format-group {
+      border-top: 1px solid #e3e7ee;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+
+    .format-group:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .format-group-title {
+      color: var(--dif-blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .2px;
+      margin: 0 0 8px 0;
+    }
+
+    .format-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .format-field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: #333;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .format-field output {
+      color: var(--dif-blue);
+      min-width: 54px;
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .format-field input[type="range"],
+    .format-field input[type="color"] {
+      width: 100%;
+      accent-color: var(--dif-blue);
+    }
+
+    .format-field input[type="color"] {
+      height: 34px;
+      padding: 2px;
+      border: 1px solid #cfd6df;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .format-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .format-panel.collapsed .format-group,
+    .format-panel.collapsed .format-actions {
+      display: none;
+    }
+
+    .format-note {
+      font-size: 11px;
+      color: #666;
+      line-height: 1.35;
+      margin-top: 8px;
+    }
+
+    /* ===== Variables aplicadas a la cotización ===== */
+    .quote-page {
+      background: var(--fmt-page-bg);
+      padding: var(--fmt-page-pad-top) var(--fmt-page-pad-x) var(--fmt-page-pad-bottom) var(--fmt-page-pad-x);
+    }
+
+    .logo {
+      width: var(--fmt-logo-width) !important;
+      height: auto !important;
+      margin-bottom: var(--fmt-logo-bottom) !important;
+    }
+
+    .quote-title {
+      color: var(--fmt-primary-color);
+      font-size: var(--fmt-title-size);
+      margin: var(--fmt-title-top) 0 var(--fmt-title-bottom) 0;
+    }
+
+    .orange-line {
+      border-top-color: var(--fmt-accent-color);
+      border-top-width: var(--fmt-line-thickness);
+    }
+
+    .date-table th,
+    .details-title,
+    .charges-table thead th,
+    .terms-title {
+      background: var(--fmt-header-bg);
+    }
+
+    .date-table th,
+    .details-title,
+    .terms-title {
+      font-size: var(--fmt-section-title-size);
+    }
+
+    .date-table td {
+      font-size: var(--fmt-date-size);
+      border-bottom-color: var(--fmt-line-color);
+    }
+
+    .party-table td {
+      height: var(--fmt-party-row-height);
+      font-size: var(--fmt-body-size);
+    }
+
+    .party-table .label,
+    .details-table .label {
+      color: var(--fmt-primary-color);
+      background: var(--fmt-label-bg);
+      font-size: var(--fmt-label-size);
+    }
+
+    .details-title {
+      margin-top: var(--fmt-details-margin-top);
+    }
+
+    .details-table td {
+      height: var(--fmt-detail-row-height);
+      font-size: var(--fmt-table-size);
+      border-color: var(--fmt-line-color);
+    }
+
+    .charges-table {
+      margin-top: var(--fmt-charges-margin-top);
+      color: var(--fmt-primary-color);
+    }
+
+    .charges-table thead th {
+      height: var(--fmt-charge-header-height);
+      font-size: var(--fmt-table-header-size);
+    }
+
+    .charges-table td {
+      height: var(--fmt-charge-row-height);
+      font-size: var(--fmt-table-size);
+    }
+
+    .charges-table .section td {
+      height: var(--fmt-charge-section-height);
+      color: var(--fmt-primary-color);
+      font-size: calc(var(--fmt-section-title-size) + 1px);
+      border-bottom-color: var(--fmt-primary-color);
+      border-bottom-width: var(--fmt-line-thickness);
+    }
+
+    .total-line {
+      margin-top: var(--fmt-total-margin-top);
+      color: var(--fmt-primary-color);
+      border-top-color: var(--fmt-primary-color);
+      border-top-width: var(--fmt-line-thickness);
+      font-size: var(--fmt-section-title-size);
+    }
+
+    .terms-title {
+      margin-top: var(--fmt-terms-margin-top);
+    }
+
+    .terms-block,
+    .terms-line {
+      color: var(--fmt-primary-color);
+      font-size: var(--fmt-terms-size);
+      line-height: var(--fmt-terms-line-height);
+    }
+
+    .terms-subtitle {
+      color: var(--fmt-primary-color);
+      font-size: calc(var(--fmt-terms-size) + 1px);
+    }
+
+    .footer {
+      border-top-color: var(--fmt-primary-color);
+      border-top-width: var(--fmt-footer-line-thickness);
+      font-size: var(--fmt-footer-size);
+    }
+
+    .internal-comment-print {
+      color: var(--fmt-primary-color);
+      border-color: var(--fmt-primary-color);
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell.workspace {
+        grid-template-columns: 1fr;
+      }
+      .control-sidebar {
+        position: static;
+        max-height: none;
+      }
+    }
+
     @media (max-width: 880px) {
       .app-shell { padding-left: 8px; padding-right: 8px; }
       .toolbar-grid { grid-template-columns: 1fr; }
@@ -425,8 +735,8 @@
 
     @media print {
       body { background: #fff; }
-      .app-shell { padding: 0; max-width: none; }
-      .toolbar, .comments-panel { display: none !important; }
+      .app-shell { padding: 0; max-width: none; display:block; }
+      .toolbar, .format-panel, .comments-panel, .control-sidebar { display: none !important; }
       .quote-page {
         width: 8.5in;
         min-height: 11in;
@@ -442,7 +752,8 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell workspace">
+    <aside class="control-sidebar">
     <section class="toolbar">
       <div class="toolbar-grid">
         <div>
@@ -474,9 +785,78 @@
       </div>
     </section>
 
+    <section class="format-panel" id="formatPanel">
+      <div class="format-panel-header">
+        <p class="toolbar-title" style="margin:0;">Formato visual</p>
+        <button class="format-toggle" id="toggleFormatPanel" type="button">Ocultar</button>
+      </div>
+
+      <div class="format-group">
+        <p class="format-group-title">Colores</p>
+        <div class="format-controls">
+          <div class="format-field"><label for="fmtPrimaryColor">Azul principal <output id="fmtPrimaryColorValue">#005baa</output></label><input type="color" id="fmtPrimaryColor"></div>
+          <div class="format-field"><label for="fmtHeaderBg">Azul barras <output id="fmtHeaderBgValue">#1468ad</output></label><input type="color" id="fmtHeaderBg"></div>
+          <div class="format-field"><label for="fmtAccentColor">Naranja línea <output id="fmtAccentColorValue">#f7941d</output></label><input type="color" id="fmtAccentColor"></div>
+          <div class="format-field"><label for="fmtLabelBg">Fondo etiquetas <output id="fmtLabelBgValue">#f0f2f5</output></label><input type="color" id="fmtLabelBg"></div>
+          <div class="format-field"><label for="fmtLineColor">Líneas grises <output id="fmtLineColorValue">#cfcfcf</output></label><input type="color" id="fmtLineColor"></div>
+        </div>
+      </div>
+
+      <div class="format-group">
+        <p class="format-group-title">Tamaños de texto</p>
+        <div class="format-controls">
+          <div class="format-field"><label for="fmtTitleSize">Título principal <output id="fmtTitleSizeValue">21px</output></label><input type="range" id="fmtTitleSize" min="16" max="30" step="1"></div>
+          <div class="format-field"><label for="fmtSectionTitleSize">Barras / subtítulos <output id="fmtSectionTitleSizeValue">16px</output></label><input type="range" id="fmtSectionTitleSize" min="12" max="22" step="1"></div>
+          <div class="format-field"><label for="fmtLabelSize">Etiquetas <output id="fmtLabelSizeValue">14px</output></label><input type="range" id="fmtLabelSize" min="10" max="18" step="1"></div>
+          <div class="format-field"><label for="fmtBodySize">Datos cliente/detalle <output id="fmtBodySizeValue">13px</output></label><input type="range" id="fmtBodySize" min="10" max="18" step="1"></div>
+          <div class="format-field"><label for="fmtDateSize">Fechas <output id="fmtDateSizeValue">14px</output></label><input type="range" id="fmtDateSize" min="10" max="18" step="1"></div>
+          <div class="format-field"><label for="fmtTableHeaderSize">Cabecera cargos <output id="fmtTableHeaderSizeValue">13px</output></label><input type="range" id="fmtTableHeaderSize" min="9" max="17" step="1"></div>
+          <div class="format-field"><label for="fmtTableSize">Tabla de cargos <output id="fmtTableSizeValue">12px</output></label><input type="range" id="fmtTableSize" min="8" max="16" step="1"></div>
+          <div class="format-field"><label for="fmtTermsSize">Términos <output id="fmtTermsSizeValue">12px</output></label><input type="range" id="fmtTermsSize" min="8" max="15" step="1"></div>
+          <div class="format-field"><label for="fmtFooterSize">Pie de página <output id="fmtFooterSizeValue">9.5px</output></label><input type="range" id="fmtFooterSize" min="7" max="12" step="0.5"></div>
+        </div>
+      </div>
+
+      <div class="format-group">
+        <p class="format-group-title">Espaciado y estructura</p>
+        <div class="format-controls">
+          <div class="format-field"><label for="fmtLogoWidth">Ancho logo <output id="fmtLogoWidthValue">92px</output></label><input type="range" id="fmtLogoWidth" min="65" max="145" step="1"></div>
+          <div class="format-field"><label for="fmtLogoBottom">Espacio bajo logo <output id="fmtLogoBottomValue">10px</output></label><input type="range" id="fmtLogoBottom" min="0" max="45" step="1"></div>
+          <div class="format-field"><label for="fmtTitleTop">Espacio antes título <output id="fmtTitleTopValue">6px</output></label><input type="range" id="fmtTitleTop" min="0" max="35" step="1"></div>
+          <div class="format-field"><label for="fmtTitleBottom">Espacio después título <output id="fmtTitleBottomValue">28px</output></label><input type="range" id="fmtTitleBottom" min="8" max="70" step="1"></div>
+          <div class="format-field"><label for="fmtPagePadTop">Margen superior página <output id="fmtPagePadTopValue">18px</output></label><input type="range" id="fmtPagePadTop" min="8" max="36" step="1"></div>
+          <div class="format-field"><label for="fmtPagePadX">Margen lateral página <output id="fmtPagePadXValue">24px</output></label><input type="range" id="fmtPagePadX" min="12" max="42" step="1"></div>
+          <div class="format-field"><label for="fmtDetailsMarginTop">Espacio detalle <output id="fmtDetailsMarginTopValue">14px</output></label><input type="range" id="fmtDetailsMarginTop" min="4" max="35" step="1"></div>
+          <div class="format-field"><label for="fmtChargesMarginTop">Espacio tabla cargos <output id="fmtChargesMarginTopValue">22px</output></label><input type="range" id="fmtChargesMarginTop" min="4" max="60" step="1"></div>
+          <div class="format-field"><label for="fmtTotalMarginTop">Espacio total <output id="fmtTotalMarginTopValue">44px</output></label><input type="range" id="fmtTotalMarginTop" min="10" max="80" step="1"></div>
+        </div>
+      </div>
+
+      <div class="format-group">
+        <p class="format-group-title">Alturas de filas y líneas</p>
+        <div class="format-controls">
+          <div class="format-field"><label for="fmtPartyRowHeight">Filas cliente/agente <output id="fmtPartyRowHeightValue">34px</output></label><input type="range" id="fmtPartyRowHeight" min="24" max="48" step="1"></div>
+          <div class="format-field"><label for="fmtDetailRowHeight">Filas detalles <output id="fmtDetailRowHeightValue">29px</output></label><input type="range" id="fmtDetailRowHeight" min="20" max="42" step="1"></div>
+          <div class="format-field"><label for="fmtChargeRowHeight">Filas cargos <output id="fmtChargeRowHeightValue">24px</output></label><input type="range" id="fmtChargeRowHeight" min="16" max="36" step="1"></div>
+          <div class="format-field"><label for="fmtChargeHeaderHeight">Cabecera cargos alto <output id="fmtChargeHeaderHeightValue">30px</output></label><input type="range" id="fmtChargeHeaderHeight" min="20" max="42" step="1"></div>
+          <div class="format-field"><label for="fmtChargeSectionHeight">Secciones cargos alto <output id="fmtChargeSectionHeightValue">26px</output></label><input type="range" id="fmtChargeSectionHeight" min="18" max="42" step="1"></div>
+          <div class="format-field"><label for="fmtTermsLineHeight">Interlineado términos <output id="fmtTermsLineHeightValue">1.06</output></label><input type="range" id="fmtTermsLineHeight" min="0.95" max="1.35" step="0.01"></div>
+          <div class="format-field"><label for="fmtLineThickness">Grosor líneas <output id="fmtLineThicknessValue">2px</output></label><input type="range" id="fmtLineThickness" min="1" max="5" step="1"></div>
+          <div class="format-field"><label for="fmtFooterLineThickness">Grosor footer <output id="fmtFooterLineThicknessValue">2px</output></label><input type="range" id="fmtFooterLineThickness" min="1" max="5" step="1"></div>
+        </div>
+      </div>
+
+      <div class="format-actions">
+        <button class="action-button primary" id="saveFormatBtn" type="button">Guardar formato</button>
+        <button class="action-button" id="resetFormatBtn" type="button">Restaurar</button>
+        <span class="status-text" id="formatStatus">Los cambios se ven en tiempo real.</span>
+      </div>
+      <div class="format-note">El formato se guarda en este navegador. El HTML copiado para Send Email V2 usa estos valores.</div>
+    </section>
+
     <section class="comments-panel">
       <p class="toolbar-title">Comentario interno de control</p>
-      <textarea id="internalComment" placeholder="Escribe aquí un comentario para enviar por Email."></textarea>
+      <textarea id="internalComment" placeholder="Escribe aquí un comentario para enviar por Power Automate. Después de enviarlo, la caja se limpia."></textarea>
       <div class="comment-options">
         <button class="action-button primary" id="saveCommentBtn" type="button">Guardar comentario</button>
         <label><input type="checkbox" id="showCommentInQuote"> Mostrar comentario dentro de la cotización</label>
@@ -484,7 +864,11 @@
       <div class="status-text" id="commentStatus">Listo para escribir un comentario nuevo.</div>
     </section>
 
-    <main id="quoteRoot"></main>
+    </aside>
+
+    <section class="quote-canvas">
+      <main id="quoteRoot"></main>
+    </section>
   </div>
 
   <script>
@@ -707,7 +1091,81 @@
     const fclContainerBox = document.getElementById('fclContainerBox');
     const fclContainerSelect = document.getElementById('fclContainerCount');
     const saveCommentBtn = document.getElementById('saveCommentBtn');
+    const formatPanel = document.getElementById('formatPanel');
+    const toggleFormatPanel = document.getElementById('toggleFormatPanel');
+    const saveFormatBtn = document.getElementById('saveFormatBtn');
+    const resetFormatBtn = document.getElementById('resetFormatBtn');
+    const formatStatus = document.getElementById('formatStatus');
 
+    const defaultFormatSettings = {
+      primaryColor: '#005baa',
+      headerBg: '#1468ad',
+      accentColor: '#f7941d',
+      lineColor: '#cfcfcf',
+      labelBg: '#f0f2f5',
+      titleSize: 21,
+      sectionTitleSize: 16,
+      labelSize: 14,
+      bodySize: 13,
+      dateSize: 14,
+      tableHeaderSize: 13,
+      tableSize: 12,
+      termsSize: 12,
+      footerSize: 9.5,
+      logoWidth: 92,
+      logoBottom: 10,
+      titleTop: 6,
+      titleBottom: 28,
+      pagePadTop: 18,
+      pagePadX: 24,
+      detailsMarginTop: 14,
+      chargesMarginTop: 22,
+      totalMarginTop: 44,
+      partyRowHeight: 34,
+      detailRowHeight: 29,
+      chargeRowHeight: 24,
+      chargeHeaderHeight: 30,
+      chargeSectionHeight: 26,
+      termsLineHeight: 1.06,
+      lineThickness: 2,
+      footerLineThickness: 2
+    };
+
+    const formatControls = {
+      primaryColor: { input: document.getElementById('fmtPrimaryColor'), output: document.getElementById('fmtPrimaryColorValue'), cssVar: '--fmt-primary-color', type: 'color' },
+      headerBg: { input: document.getElementById('fmtHeaderBg'), output: document.getElementById('fmtHeaderBgValue'), cssVar: '--fmt-header-bg', type: 'color' },
+      accentColor: { input: document.getElementById('fmtAccentColor'), output: document.getElementById('fmtAccentColorValue'), cssVar: '--fmt-accent-color', type: 'color' },
+      lineColor: { input: document.getElementById('fmtLineColor'), output: document.getElementById('fmtLineColorValue'), cssVar: '--fmt-line-color', type: 'color' },
+      labelBg: { input: document.getElementById('fmtLabelBg'), output: document.getElementById('fmtLabelBgValue'), cssVar: '--fmt-label-bg', type: 'color' },
+      titleSize: { input: document.getElementById('fmtTitleSize'), output: document.getElementById('fmtTitleSizeValue'), cssVar: '--fmt-title-size', unit: 'px' },
+      sectionTitleSize: { input: document.getElementById('fmtSectionTitleSize'), output: document.getElementById('fmtSectionTitleSizeValue'), cssVar: '--fmt-section-title-size', unit: 'px' },
+      labelSize: { input: document.getElementById('fmtLabelSize'), output: document.getElementById('fmtLabelSizeValue'), cssVar: '--fmt-label-size', unit: 'px' },
+      bodySize: { input: document.getElementById('fmtBodySize'), output: document.getElementById('fmtBodySizeValue'), cssVar: '--fmt-body-size', unit: 'px' },
+      dateSize: { input: document.getElementById('fmtDateSize'), output: document.getElementById('fmtDateSizeValue'), cssVar: '--fmt-date-size', unit: 'px' },
+      tableHeaderSize: { input: document.getElementById('fmtTableHeaderSize'), output: document.getElementById('fmtTableHeaderSizeValue'), cssVar: '--fmt-table-header-size', unit: 'px' },
+      tableSize: { input: document.getElementById('fmtTableSize'), output: document.getElementById('fmtTableSizeValue'), cssVar: '--fmt-table-size', unit: 'px' },
+      termsSize: { input: document.getElementById('fmtTermsSize'), output: document.getElementById('fmtTermsSizeValue'), cssVar: '--fmt-terms-size', unit: 'px' },
+      footerSize: { input: document.getElementById('fmtFooterSize'), output: document.getElementById('fmtFooterSizeValue'), cssVar: '--fmt-footer-size', unit: 'px' },
+      logoWidth: { input: document.getElementById('fmtLogoWidth'), output: document.getElementById('fmtLogoWidthValue'), cssVar: '--fmt-logo-width', unit: 'px' },
+      logoBottom: { input: document.getElementById('fmtLogoBottom'), output: document.getElementById('fmtLogoBottomValue'), cssVar: '--fmt-logo-bottom', unit: 'px' },
+      titleTop: { input: document.getElementById('fmtTitleTop'), output: document.getElementById('fmtTitleTopValue'), cssVar: '--fmt-title-top', unit: 'px' },
+      titleBottom: { input: document.getElementById('fmtTitleBottom'), output: document.getElementById('fmtTitleBottomValue'), cssVar: '--fmt-title-bottom', unit: 'px' },
+      pagePadTop: { input: document.getElementById('fmtPagePadTop'), output: document.getElementById('fmtPagePadTopValue'), cssVar: '--fmt-page-pad-top', unit: 'px' },
+      pagePadX: { input: document.getElementById('fmtPagePadX'), output: document.getElementById('fmtPagePadXValue'), cssVar: '--fmt-page-pad-x', unit: 'px' },
+      detailsMarginTop: { input: document.getElementById('fmtDetailsMarginTop'), output: document.getElementById('fmtDetailsMarginTopValue'), cssVar: '--fmt-details-margin-top', unit: 'px' },
+      chargesMarginTop: { input: document.getElementById('fmtChargesMarginTop'), output: document.getElementById('fmtChargesMarginTopValue'), cssVar: '--fmt-charges-margin-top', unit: 'px' },
+      totalMarginTop: { input: document.getElementById('fmtTotalMarginTop'), output: document.getElementById('fmtTotalMarginTopValue'), cssVar: '--fmt-total-margin-top', unit: 'px' },
+      partyRowHeight: { input: document.getElementById('fmtPartyRowHeight'), output: document.getElementById('fmtPartyRowHeightValue'), cssVar: '--fmt-party-row-height', unit: 'px' },
+      detailRowHeight: { input: document.getElementById('fmtDetailRowHeight'), output: document.getElementById('fmtDetailRowHeightValue'), cssVar: '--fmt-detail-row-height', unit: 'px' },
+      chargeRowHeight: { input: document.getElementById('fmtChargeRowHeight'), output: document.getElementById('fmtChargeRowHeightValue'), cssVar: '--fmt-charge-row-height', unit: 'px' },
+      chargeHeaderHeight: { input: document.getElementById('fmtChargeHeaderHeight'), output: document.getElementById('fmtChargeHeaderHeightValue'), cssVar: '--fmt-charge-header-height', unit: 'px' },
+      chargeSectionHeight: { input: document.getElementById('fmtChargeSectionHeight'), output: document.getElementById('fmtChargeSectionHeightValue'), cssVar: '--fmt-charge-section-height', unit: 'px' },
+      termsLineHeight: { input: document.getElementById('fmtTermsLineHeight'), output: document.getElementById('fmtTermsLineHeightValue'), cssVar: '--fmt-terms-line-height', unit: '' },
+      lineThickness: { input: document.getElementById('fmtLineThickness'), output: document.getElementById('fmtLineThicknessValue'), cssVar: '--fmt-line-thickness', unit: 'px' },
+      footerLineThickness: { input: document.getElementById('fmtFooterLineThickness'), output: document.getElementById('fmtFooterLineThicknessValue'), cssVar: '--fmt-footer-line-thickness', unit: 'px' }
+    };
+
+    let currentFormatSettings = { ...defaultFormatSettings };
     let currentComment = '';
     let commentRequestVersion = 0;
 
@@ -725,7 +1183,7 @@
     }
 
     function buildHeaderLogo() {
-      return `<img class="logo" src="${LOGO_URL}" alt="DIF Servicios Logísticos" width="92" style="width:92px;height:auto;display:block;margin:0 0 10px 2px;background:transparent;border:0;object-fit:contain;">`;
+      return `<img class="logo" src="${LOGO_URL}" alt="DIF Servicios Logísticos" style="height:auto;display:block;background:transparent;border:0;object-fit:contain;">`;
     }
 
     function buildInfo(q) {
@@ -996,44 +1454,45 @@
     }
 
     function getPowerAutomateCss() {
+      const f = getFormatCssValues();
       return `
-        :root{--dif-blue:#005baa;--dif-blue-2:#1468ad;--dif-orange:#f7941d;--line:#cfcfcf;--label-bg:#f0f2f5;}
+        *{box-sizing:border-box;}
         body{margin:0;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;}
-        .quote-page{width:816px;height:1056px;background:#fff;margin:0 auto 18px auto;padding:18px 24px 14px 24px;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;}
+        .quote-page{width:816px;height:1056px;background:#fff;margin:0 auto 18px auto;padding:${f.pagePadTop} ${f.pagePadX} 14px ${f.pagePadX};overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;}
         .page-main{display:block;flex:0 0 auto;}
-        .logo{width:92px;height:auto;display:block;margin:0 0 10px 2px;background:transparent;border:0;object-fit:contain;}
-        .quote-title{text-align:center;color:#005baa;font-size:21px;font-weight:700;margin:6px 0 28px 0;line-height:1;}
-        .orange-line{border-top:2px solid #f7941d;margin:0 0 12px 0;}
+        .logo{width:${f.logoWidth};height:auto;display:block;margin:0 0 ${f.logoBottom} 2px;background:transparent;border:0;object-fit:contain;}
+        .quote-title{text-align:center;color:${f.primaryColor};font-size:${f.titleSize};font-weight:700;margin:${f.titleTop} 0 ${f.titleBottom} 0;line-height:1;}
+        .orange-line{border-top:${f.lineThickness} solid ${f.accentColor};margin:0 0 12px 0;}
         table{border-collapse:collapse;width:100%;}
         .date-table{table-layout:fixed;}
-        .date-table th{width:50%;background:#1468ad;color:#fff;font-size:16px;line-height:1;height:20px;padding:3px 8px;text-align:center !important;font-weight:700;vertical-align:middle;}
-        .date-table td{width:50%;height:24px;text-align:center !important;font-size:14px;padding:4px 8px 6px;border-bottom:1px solid #cfcfcf;vertical-align:middle;}
+        .date-table th{width:50%;background:${f.headerBg};color:#fff;font-size:${f.sectionTitleSize};line-height:1;height:20px;padding:3px 8px;text-align:center !important;font-weight:700;vertical-align:middle;}
+        .date-table td{width:50%;height:24px;text-align:center !important;font-size:${f.dateSize};padding:4px 8px 6px;border-bottom:1px solid ${f.lineColor};vertical-align:middle;}
         .party-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:34px;margin-top:16px;}
-        .party-table td{vertical-align:middle;height:34px;font-size:13px;padding:5px 7px;}
-        .party-table .label{width:165px;background:#f0f2f5;color:#005baa;font-weight:700;font-size:14px;}
-        .details-title{margin-top:14px;background:#1468ad;color:#fff;text-align:center;height:20px;line-height:20px;font-weight:700;font-size:16px;}
-        .details-table td{border:1px solid #cfcfcf;height:29px;font-size:12.5px;padding:4px 7px;vertical-align:middle;}
-        .details-table .label{width:135px;background:#f0f2f5;color:#005baa;font-weight:700;font-size:14px;}
+        .party-table td{vertical-align:middle;height:${f.partyRowHeight};font-size:${f.bodySize};padding:5px 7px;}
+        .party-table .label{width:165px;background:${f.labelBg};color:${f.primaryColor};font-weight:700;font-size:${f.labelSize};}
+        .details-title{margin-top:${f.detailsMarginTop};background:${f.headerBg};color:#fff;text-align:center;height:20px;line-height:20px;font-weight:700;font-size:${f.sectionTitleSize};}
+        .details-table td{border:1px solid ${f.lineColor};height:${f.detailRowHeight};font-size:${f.tableSize};padding:4px 7px;vertical-align:middle;}
+        .details-table .label{width:135px;background:${f.labelBg};color:${f.primaryColor};font-weight:700;font-size:${f.labelSize};}
         .details-table .value{width:240px;}
-        .charges-table{margin-top:22px;color:#005baa;table-layout:fixed;}
-        .charges-table thead th{background:#1468ad;color:#fff;height:30px;padding:5px 5px;font-size:13px;font-weight:700;text-align:right;}
+        .charges-table{margin-top:${f.chargesMarginTop};color:${f.primaryColor};table-layout:fixed;}
+        .charges-table thead th{background:${f.headerBg};color:#fff;height:${f.chargeHeaderHeight};padding:5px 5px;font-size:${f.tableHeaderSize};font-weight:700;text-align:right;}
         .charges-table thead th:first-child{text-align:left;}
-        .charges-table td{height:24px;padding:4px 5px;font-size:12px;vertical-align:middle;text-align:right;line-height:1.1;}
+        .charges-table td{height:${f.chargeRowHeight};padding:4px 5px;font-size:${f.tableSize};vertical-align:middle;text-align:right;line-height:1.1;}
         .charges-table td:first-child{text-align:left;}
-        .charges-table .section td{height:26px;padding-top:7px;color:#005baa;font-size:17px;line-height:1;text-align:left;font-weight:700;border-bottom:2px solid #005baa;}
+        .charges-table .section td{height:${f.chargeSectionHeight};padding-top:7px;color:${f.primaryColor};font-size:${f.sectionTitleSize};line-height:1;text-align:left;font-weight:700;border-bottom:${f.lineThickness} solid ${f.primaryColor};}
         .charges-table .total-value{font-weight:700;}
         .charges-table.continuation{margin-top:34px;}
-        .charges-table.continuation td{font-size:14px;height:30px;}
-        .charges-table.continuation .section td{font-size:18px;height:32px;}
-        .total-line{margin-top:44px;border-top:2px solid #005baa;display:grid;grid-template-columns:1fr 1fr;align-items:center;color:#005baa;font-size:16px;font-weight:700;padding:10px 8px 0 8px;min-height:34px;}
+        .charges-table.continuation td{font-size:${f.tableSize};height:${f.chargeRowHeight};}
+        .charges-table.continuation .section td{font-size:${f.sectionTitleSize};height:${f.chargeSectionHeight};}
+        .total-line{margin-top:${f.totalMarginTop};border-top:${f.lineThickness} solid ${f.primaryColor};display:grid;grid-template-columns:1fr 1fr;align-items:center;color:${f.primaryColor};font-size:${f.sectionTitleSize};font-weight:700;padding:10px 8px 0 8px;min-height:34px;}
         .total-line .amount{text-align:right;}
         .total-line.multi{grid-template-columns:1.65fr 1fr 1fr 1fr;column-gap:8px;}
-        .terms-title{margin-top:34px;height:28px;line-height:28px;text-align:center;background:#1468ad;color:#fff;font-size:16px;font-weight:700;}
-        .terms-block{color:#005baa;font-size:12px;line-height:1.06;padding:10px 6px 0 6px;}
-        .terms-subtitle{font-weight:700;margin:6px 0 7px 0;font-size:13px;color:#005baa;}
-        .terms-line{margin:0 0 1px 0;color:#005baa;font-size:12px;line-height:1.06;}
-        .footer{border-top:2px solid #005baa;color:#536271;text-align:center;font-size:9.5px;line-height:1.5;padding-top:4px;margin-top:auto;}
-        .internal-comment-print{display:block;color:#005baa;border:1px solid #005baa;margin-top:18px;padding:8px 10px;font-size:12px;white-space:pre-line;}
+        .terms-title{margin-top:34px;height:28px;line-height:28px;text-align:center;background:${f.headerBg};color:#fff;font-size:${f.sectionTitleSize};font-weight:700;}
+        .terms-block{color:${f.primaryColor};font-size:${f.termsSize};line-height:${f.termsLineHeight};padding:10px 6px 0 6px;}
+        .terms-subtitle{font-weight:700;margin:6px 0 7px 0;font-size:${f.termsSize};color:${f.primaryColor};}
+        .terms-line{margin:0 0 1px 0;color:${f.primaryColor};font-size:${f.termsSize};line-height:${f.termsLineHeight};}
+        .footer{border-top:${f.footerLineThickness} solid ${f.primaryColor};color:#536271;text-align:center;font-size:${f.footerSize};line-height:1.5;padding-top:4px;margin-top:auto;}
+        .internal-comment-print{display:block;color:${f.primaryColor};border:1px solid ${f.primaryColor};margin-top:18px;padding:8px 10px;font-size:${f.tableSize};white-space:pre-line;}
       `;
     }
 
@@ -1079,6 +1538,106 @@ ${root.innerHTML}
       return beautifyHtml(html);
     }
 
+
+
+    function isColorValue(value) {
+      return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
+    }
+
+    function normalizeFormatSettings(settings) {
+      const normalized = { ...defaultFormatSettings };
+      Object.keys(defaultFormatSettings).forEach(key => {
+        const control = formatControls[key];
+        const fallback = defaultFormatSettings[key];
+        const value = settings?.[key];
+        if (control?.type === 'color') {
+          normalized[key] = isColorValue(value) ? value : fallback;
+        } else {
+          const numberValue = Number(value);
+          normalized[key] = Number.isFinite(numberValue) ? numberValue : fallback;
+        }
+      });
+      return normalized;
+    }
+
+    function formatDisplayValue(value, control) {
+      if (control.type === 'color') return value;
+      return `${value}${control.unit || ''}`;
+    }
+
+    function applyFormatSettings(settings, rerender = true) {
+      currentFormatSettings = normalizeFormatSettings(settings);
+      Object.entries(formatControls).forEach(([key, control]) => {
+        const value = currentFormatSettings[key];
+        const cssValue = control.type === 'color' ? value : `${value}${control.unit || ''}`;
+        document.documentElement.style.setProperty(control.cssVar, cssValue);
+        if (control.input) control.input.value = String(value);
+        if (control.output) control.output.textContent = formatDisplayValue(value, control);
+      });
+      if (rerender) renderQuote();
+    }
+
+    function loadSavedFormatSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('dif_quote_format_settings') || 'null');
+        applyFormatSettings(saved || defaultFormatSettings, false);
+        formatStatus.textContent = saved ? 'Formato guardado cargado.' : 'Formato estándar cargado.';
+      } catch (err) {
+        applyFormatSettings(defaultFormatSettings, false);
+        formatStatus.textContent = 'Formato estándar cargado.';
+      }
+      const collapsed = localStorage.getItem('dif_quote_format_panel_collapsed') === '1';
+      formatPanel.classList.toggle('collapsed', collapsed);
+      toggleFormatPanel.textContent = collapsed ? 'Mostrar' : 'Ocultar';
+    }
+
+    function saveFormatSettings() {
+      localStorage.setItem('dif_quote_format_settings', JSON.stringify(currentFormatSettings));
+      formatStatus.textContent = 'Formato guardado como predeterminado en este navegador.';
+    }
+
+    function resetFormatSettings() {
+      localStorage.removeItem('dif_quote_format_settings');
+      applyFormatSettings(defaultFormatSettings);
+      formatStatus.textContent = 'Formato restaurado al estándar.';
+    }
+
+    function getFormatCssValues() {
+      const f = currentFormatSettings;
+      return {
+        primaryColor: f.primaryColor,
+        headerBg: f.headerBg,
+        accentColor: f.accentColor,
+        lineColor: f.lineColor,
+        labelBg: f.labelBg,
+        titleSize: `${f.titleSize}px`,
+        sectionTitleSize: `${f.sectionTitleSize}px`,
+        labelSize: `${f.labelSize}px`,
+        bodySize: `${f.bodySize}px`,
+        dateSize: `${f.dateSize}px`,
+        tableHeaderSize: `${f.tableHeaderSize}px`,
+        tableSize: `${f.tableSize}px`,
+        termsSize: `${f.termsSize}px`,
+        footerSize: `${f.footerSize}px`,
+        logoWidth: `${f.logoWidth}px`,
+        logoBottom: `${f.logoBottom}px`,
+        titleTop: `${f.titleTop}px`,
+        titleBottom: `${f.titleBottom}px`,
+        pagePadTop: `${f.pagePadTop}px`,
+        pagePadX: `${f.pagePadX}px`,
+        detailsMarginTop: `${f.detailsMarginTop}px`,
+        chargesMarginTop: `${f.chargesMarginTop}px`,
+        totalMarginTop: `${f.totalMarginTop}px`,
+        partyRowHeight: `${f.partyRowHeight}px`,
+        detailRowHeight: `${f.detailRowHeight}px`,
+        chargeRowHeight: `${f.chargeRowHeight}px`,
+        chargeHeaderHeight: `${f.chargeHeaderHeight}px`,
+        chargeSectionHeight: `${f.chargeSectionHeight}px`,
+        termsLineHeight: f.termsLineHeight,
+        lineThickness: `${f.lineThickness}px`,
+        footerLineThickness: `${f.footerLineThickness}px`
+      };
+    }
 
     function getCurrentQuoteNumber() {
       const q = quoteData[currentType][currentLang];
@@ -1249,8 +1808,10 @@ ${root.innerHTML}
       radio.addEventListener('change', e => {
         currentLang = e.target.value;
         currentComment = '';
+        commentBox.value = '';
         renderQuote();
-        });
+        statusText.textContent = 'Listo para escribir un comentario nuevo.';
+      });
     });
 
     commentBox.addEventListener('input', () => {
@@ -1282,8 +1843,30 @@ ${root.innerHTML}
       }
     });
 
+    Object.entries(formatControls).forEach(([key, control]) => {
+      if (!control.input) return;
+      control.input.addEventListener('input', () => {
+        currentFormatSettings[key] = control.type === 'color' ? control.input.value : Number(control.input.value);
+        applyFormatSettings(currentFormatSettings);
+        formatStatus.textContent = 'Cambio aplicado en tiempo real. Presiona Guardar formato para fijarlo.';
+      });
+    });
+
+    saveFormatBtn.addEventListener('click', saveFormatSettings);
+    resetFormatBtn.addEventListener('click', resetFormatSettings);
+
+    toggleFormatPanel.addEventListener('click', () => {
+      const collapsed = !formatPanel.classList.contains('collapsed');
+      formatPanel.classList.toggle('collapsed', collapsed);
+      toggleFormatPanel.textContent = collapsed ? 'Mostrar' : 'Ocultar';
+      localStorage.setItem('dif_quote_format_panel_collapsed', collapsed ? '1' : '0');
+    });
+
+    loadSavedFormatSettings();
     renderQuote();
-    loadCommentFromPowerAutomate();
-  </script>
+    commentBox.value = '';
+    currentComment = '';
+    statusText.textContent = 'Listo para escribir un comentario nuevo.';
+ </script>
 </body>
 </html>
