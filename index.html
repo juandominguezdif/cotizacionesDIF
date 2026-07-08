@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DIF - Cotizaciones v13</title>
+  <title>DIF - Cotizaciones v15</title>
   <style>
     :root {
       --dif-blue: #005baa;
@@ -140,6 +140,82 @@
       color: #333;
       font-size: 13px;
       cursor: pointer;
+    }
+
+
+    .template-text-panel {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+
+    .template-text-panel.collapsed .template-fields,
+    .template-text-panel.collapsed .template-actions,
+    .template-text-panel.collapsed .template-note {
+      display: none;
+    }
+
+    .template-note {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.35;
+      margin: 4px 0 10px;
+    }
+
+    .template-fields {
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .template-section-title {
+      color: var(--dif-blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .2px;
+      margin: 12px 0 7px;
+      border-top: 1px solid #e3e7ee;
+      padding-top: 10px;
+    }
+
+    .template-section-title:first-child {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .template-field {
+      margin-bottom: 8px;
+    }
+
+    .template-field label {
+      display: block;
+      color: #333;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .template-field input {
+      width: 100%;
+      border: 1px solid #cfd5df;
+      border-radius: 6px;
+      padding: 7px 8px;
+      font-size: 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+      background: #fff;
+    }
+
+    .template-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     .comments-panel {
@@ -761,6 +837,7 @@
 
       .toolbar,
       .format-panel,
+      .template-text-panel,
       .comments-panel,
       .control-sidebar {
         display: none !important;
@@ -887,12 +964,28 @@
         <button class="action-button" id="resetFormatBtn" type="button">Restaurar</button>
         <span class="status-text" id="formatStatus">Los cambios se ven en tiempo real. Guarda para sincronizar globalmente.</span>
       </div>
-      <div class="format-note">El formato guardado se sincroniza en SharePoint vía Power Automate.</div>
+      <div class="format-note">El formato guardado se sincroniza en SharePoint vía Power Automate y se aplica a cualquier navegador que abra esta web. La impresión usa paginación segura para evitar páginas en blanco.</div>
+    </section>
+
+    <section class="template-text-panel" id="templateTextPanel">
+      <div class="format-panel-header">
+        <p class="toolbar-title" style="margin:0;">Textos de plantilla</p>
+        <button class="format-toggle" id="toggleTemplateTextPanel" type="button">Ocultar</button>
+      </div>
+      <div class="template-note">
+        Edita los textos del tipo e idioma activo. Al guardar, se sincronizan en SharePoint y cualquier navegador verá la misma plantilla.
+      </div>
+      <div class="template-fields" id="templateTextFields"></div>
+      <div class="template-actions">
+        <button class="action-button primary" id="saveTemplateTextBtn" type="button">Guardar textos</button>
+        <button class="action-button" id="resetTemplateTextBtn" type="button">Restaurar textos</button>
+        <span class="status-text" id="templateTextStatus">Los cambios de texto se ven en tiempo real.</span>
+      </div>
     </section>
 
     <section class="comments-panel">
       <p class="toolbar-title">Comentario interno de control</p>
-      <textarea id="internalComment" placeholder="Escribe aquí un comentario para enviar por Power Automate. "></textarea>
+      <textarea id="internalComment" placeholder="Escribe aquí un comentario para enviar por Power Automate. Después de enviarlo, la caja se limpia."></textarea>
       <div class="comment-options">
         <button class="action-button primary" id="saveCommentBtn" type="button">Guardar comentario</button>
         <label><input type="checkbox" id="showCommentInQuote"> Mostrar comentario dentro de la cotización</label>
@@ -908,12 +1001,15 @@
   </div>
 
   <script>
-    const LOGO_URL = 'https://dif.com.do/img/DIF2.png';
+    const LOGO_URL = 'https://dif.com.do/img/dif.png';
     const POWER_AUTOMATE_COMMENTS_URL = 'https://48f0fcb04df7e0b687051ce009ac53.03.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3e059c56be694532bc45ac7d854c951b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bNTv8KYGPEFyj4tpW9_E1al-dR3h8nOpeKZxAJWwjBA';
     const COMMENTS_TOKEN = 'dif-cotizaciones-2026';
     const GLOBAL_FORMAT_NUMBER = 'GLOBAL-FORMAT';
     const GLOBAL_FORMAT_TYPE = 'FORMAT';
     const GLOBAL_FORMAT_LANG = 'GLOBAL';
+    const GLOBAL_TEMPLATE_TEXT_NUMBER = 'GLOBAL-TEMPLATE-TEXTS';
+    const GLOBAL_TEMPLATE_TEXT_TYPE = 'TEMPLATE';
+    const GLOBAL_TEMPLATE_TEXT_LANG = 'GLOBAL';
 
     const termsCatalog = {
       "Aduana / Aéreo": {
@@ -1006,9 +1102,9 @@
           terms: [{title:'NOTAS EMBARQUE', text: terms.ES_AIR}]
         },
         EN: {
-          title: 'QUOTATION COT-000014500',
+          title: 'QUOTE NO: COT-000014500',
           labels: {
-            date: 'DATE', expires: 'DATE EXPIRES IN', customer: 'CUSTOMER', executive: 'EXECUTIVE', email: 'EMAIL', agent: 'AGENT', address: 'DESTINATION', phone: 'PHONE', shipmentInfo: 'SHIPMENT INFORMATION', origin: 'ORIGIN', destination: 'DESTINATION', incoterm: 'INCOTERM', measure: 'CHARGEABLE WEIGHT', type: 'TYPE OF SHIPMENT', pieces: 'PIECES', transit: 'TRANSIT TIME', route: 'ROUTE', payment: 'PAYMENT TERMS', description: 'DESCRIPTION', application: 'APLICATION', qty: 'QTY', amount: 'AMOUNT', min: 'MIN', total: 'TOTAL', terms: 'TERMS AND CONDITIONS', remarks: 'SHIPMENT REMARKS', internalComment: 'INTERNAL COMMENT'
+            date: 'DATE', expires: 'EXPIRES ON', customer: 'SALES', executive: 'EXECUTIVE', email: 'EMAIL', agent: 'AGENT', address: 'DESTINATION', phone: 'PHONE', shipmentInfo: 'SHIPMENT INFORMATION', origin: 'ORIGIN', destination: 'DESTINATION', incoterm: 'INCOTERM', measure: 'CHARGEABLE WEIGHT', type: 'TYPE OF SHIPMENT', pieces: 'PCS', transit: 'TRANSIT TIME', route: 'ROUTE', payment: 'PAYMENT TERMS', description: 'DESCRIPTION', application: 'APLICATION', qty: 'QTY', amount: 'AMOUNT', min: 'MIN', total: 'TOTAL', terms: 'TERMS AND CONDITIONS', remarks: 'SHIPMENT REMARKS', internalComment: 'INTERNAL COMMENT'
           },
           values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'Air Cargo', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Payment in 45 days', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
           headers: ['DESCRIPTION','APLICATION','QTY','AMOUNT','MIN','TOTAL'],
@@ -1017,7 +1113,7 @@
             ['DRAYAGE','CNTR','1.00','43.00','0.00','43.00'],
             ['FREIGHT SERVICES','CFT','80,741.61','2.60','230.00','209,928.19'],
             ['FUEL SURCHARGE','CFT','80,741.61','100.00','0.33','225.00'],
-            {section:'CHARGES OF ORIGIN'},
+            {section:'ORIGIN CHARGES'},
             ['ORIGIN CHARGES (I)','AWB','1.00','100.00','0.00','100.00'],
             ['BL','AWB','1.00','35.00','0.00','35.00'],
             ['ORIGIN CHARGES (I)','UNIT','1.00','30.00','0.00','30.00'],
@@ -1056,8 +1152,8 @@
     };
 
     quoteData.LCL.EN = {
-      title: 'QUOTATION COT-000014500',
-      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUMEN' },
+      title: 'QUOTE NO: COT-000014500',
+      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUME' },
       values: { date: '25/11/2025', expires: '27/8/2026', customer: 'AES ANDRES DR SA', executive: 'Clientes DIF', email: 'leonel.rosa@aes.com', agent: '3 R ELEMENTOS', address: 'SANTO DOMINGO, REPÚBLICA\nDOMINICANA', phone: '8090000000', origin: 'USMIA', destination: 'DOCAU', incoterm: 'EXW', measure: '2,286.35 M³', type: 'LCL', pieces: '1.00', transit: '30 A 45', route: 'Prueba', payment: 'Payment in 45 days', totalLabel: 'TOTAL USD  :', totalAmount: 'US$216,147.03' },
       headers: ['DESCRIPTION','APLICATION','QTY','AMOUNT','MIN','MAX','TOTAL'],
       page1: [
@@ -1065,7 +1161,7 @@
         ['INLAND SERVICE','CNTR','1.00','43.00','0.00','0.00','43.00'],
         ['FREIGHT SERVICES','CFT','80,741.61','2.60','230.00','0.00','209,928.19'],
         ['FUEL SURCHARGE','CFT','80,741.61','100.00','0.33','225.00','225.00'],
-        {section:'CHARGES OF ORIGIN'},
+        {section:'ORIGIN CHARGES'},
         ['ORIGIN CHARGES (I)','BL','1.00','100.00','0.00','100.00','100.00'],
         ['BL','BL','1.00','35.00','0.00','35.00','35.00'],
         ['ORIGIN CHARGES (I)','UNIT','1.00','30.00','0.00','30.00','30.00'],
@@ -1099,14 +1195,14 @@
     };
 
     quoteData.FCL.EN = {
-      title: 'QUOTATION COT-000014508',
-      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUMEN' },
+      title: 'QUOTE NO: COT-000014508',
+      labels: { ...quoteData.AEREO.EN.labels, measure: 'VOLUME' },
       values: { date: '9/2/2026', expires: '27/2/2026', customer: 'ACCIONA FORWARDING SA', executive: 'Clientes DIF', email: 'PRICING.FORWARDING@ACCION\nA.COM', agent: 'ACCIONA FORWARDING SA', address: 'Avda de Aragon 402 Edifcio Allende, 8ª\n28022 Madrid, MADRID, MADIRD, ESPAÑA', phone: '34917227800', origin: 'ESBCN', destination: 'DOSDQ', incoterm: 'EXW', measure: '68.00 M³', type: 'FCL', pieces: '1.00', transit: 'N/A', route: '', payment: 'Cash', totalLabel: 'TOTAL  :', total20: '$4,290.00', total40: '$48,325.00', total40hc: '$7,255.00' },
       headers: ['DESCRIPTION','APLICATION','QTY','20FT','40FT','40FT HC'],
       page1: [
         {section:'FREIGHT OF CHARGES'},
         ['FREIGHT SERVICES','WM','1','$2,000.00','$24,000.00','$3,500.00'],
-        {section:'CHARGES OF ORIGIN'},
+        {section:'ORIGIN CHARGES'},
         ['Origin Surcharge\nIncluye: Customs Fee USD 75.00/PS\n+ Port Charge USD 15.00/BL +\nHandling Fee USD 50.00/BL','LS','1','$2,000.00','$24,000.00','$3,500.00'],
         {section:'DESTINATION CHARGES'},
         ['CFS','B/L','1','$75.00','$110.00','$40.00'],
@@ -1135,6 +1231,12 @@
     const saveFormatBtn = document.getElementById('saveFormatBtn');
     const resetFormatBtn = document.getElementById('resetFormatBtn');
     const formatStatus = document.getElementById('formatStatus');
+    const templateTextPanel = document.getElementById('templateTextPanel');
+    const toggleTemplateTextPanel = document.getElementById('toggleTemplateTextPanel');
+    const templateTextFields = document.getElementById('templateTextFields');
+    const saveTemplateTextBtn = document.getElementById('saveTemplateTextBtn');
+    const resetTemplateTextBtn = document.getElementById('resetTemplateTextBtn');
+    const templateTextStatus = document.getElementById('templateTextStatus');
 
     const defaultFormatSettings = {
       primaryColor: '#005baa',
@@ -1219,6 +1321,7 @@
     };
 
     let currentFormatSettings = { ...defaultFormatSettings };
+    let templateTextOverrides = {};
     let currentComment = '';
     let commentRequestVersion = 0;
     let isPreparingPrint = false;
@@ -1746,6 +1849,335 @@ ${root.innerHTML}
       }
     }
 
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function getTemplateOverride(type = currentType, lang = currentLang) {
+      return templateTextOverrides?.[type]?.[lang] || {};
+    }
+
+    function ensureTemplateOverride(type = currentType, lang = currentLang) {
+      if (!templateTextOverrides[type]) templateTextOverrides[type] = {};
+      if (!templateTextOverrides[type][lang]) templateTextOverrides[type][lang] = {};
+      const target = templateTextOverrides[type][lang];
+      if (!target.labels) target.labels = {};
+      if (!Array.isArray(target.headers)) target.headers = [];
+      if (!target.sections) target.sections = {};
+      if (!Array.isArray(target.termsTitles)) target.termsTitles = [];
+      return target;
+    }
+
+    function cleanTemplateTextSettings(settings) {
+      const allowedTypes = ['AEREO', 'LCL', 'FCL'];
+      const allowedLangs = ['ES', 'EN'];
+      const cleaned = {};
+
+      allowedTypes.forEach(type => {
+        allowedLangs.forEach(lang => {
+          const source = settings?.[type]?.[lang];
+          if (!source || typeof source !== 'object') return;
+
+          const next = {};
+
+          if (typeof source.title === 'string') {
+            next.title = source.title;
+          }
+
+          if (source.labels && typeof source.labels === 'object') {
+            const labels = {};
+            Object.entries(source.labels).forEach(([key, value]) => {
+              if (typeof value === 'string') labels[key] = value;
+            });
+            if (Object.keys(labels).length) next.labels = labels;
+          }
+
+          if (Array.isArray(source.headers)) {
+            next.headers = source.headers.map(value => typeof value === 'string' ? value : '');
+          }
+
+          if (source.sections && typeof source.sections === 'object') {
+            const sections = {};
+            Object.entries(source.sections).forEach(([key, value]) => {
+              if (typeof value === 'string') sections[key] = value;
+            });
+            if (Object.keys(sections).length) next.sections = sections;
+          }
+
+          if (Array.isArray(source.termsTitles)) {
+            next.termsTitles = source.termsTitles.map(value => typeof value === 'string' ? value : '');
+          }
+
+          if (Object.keys(next).length) {
+            if (!cleaned[type]) cleaned[type] = {};
+            cleaned[type][lang] = next;
+          }
+        });
+      });
+
+      return cleaned;
+    }
+
+    function applyTemplateTextOverridesToQuote(baseQuote, type = currentType, lang = currentLang) {
+      const q = deepClone(baseQuote);
+      const override = getTemplateOverride(type, lang);
+
+      if (typeof override.title === 'string') {
+        q.title = override.title;
+      }
+
+      if (override.labels && typeof override.labels === 'object') {
+        q.labels = { ...q.labels, ...override.labels };
+      }
+
+      if (Array.isArray(override.headers)) {
+        q.headers = q.headers.map((header, index) =>
+          typeof override.headers[index] === 'string' ? override.headers[index] : header
+        );
+      }
+
+      const applySectionOverrides = rows => {
+        if (!Array.isArray(rows)) return rows;
+        return rows.map(row => {
+          if (row && row.section && override.sections && typeof override.sections[row.section] === 'string') {
+            return { ...row, section: override.sections[row.section] };
+          }
+          return row;
+        });
+      };
+
+      q.page1 = applySectionOverrides(q.page1);
+      q.page2 = applySectionOverrides(q.page2);
+
+      if (Array.isArray(q.terms) && Array.isArray(override.termsTitles)) {
+        q.terms = q.terms.map((term, index) => ({
+          ...term,
+          title: typeof override.termsTitles[index] === 'string' ? override.termsTitles[index] : term.title
+        }));
+      }
+
+      return q;
+    }
+
+    function getCurrentQuote() {
+      return applyTemplateTextOverridesToQuote(quoteData[currentType][currentLang], currentType, currentLang);
+    }
+
+    function getUniqueBaseSections(baseQuote) {
+      const sections = [];
+      [...(baseQuote.page1 || []), ...(baseQuote.page2 || [])].forEach(row => {
+        if (row && row.section && !sections.includes(row.section)) {
+          sections.push(row.section);
+        }
+      });
+      return sections;
+    }
+
+    function renderTemplateTextEditor() {
+      if (!templateTextFields) return;
+
+      const base = quoteData[currentType][currentLang];
+      const current = getCurrentQuote();
+      const override = getTemplateOverride(currentType, currentLang);
+
+      const labelNames = {
+        date: 'Fecha',
+        expires: 'Vencimiento',
+        customer: 'Cliente / Sales',
+        executive: 'Ejecutivo',
+        email: 'Email',
+        agent: 'Agente',
+        address: 'Dirección / destino',
+        phone: 'Teléfono',
+        shipmentInfo: 'Título detalles',
+        origin: 'Origen',
+        destination: 'Destino',
+        incoterm: 'Incoterm',
+        measure: 'Medida / volumen / peso',
+        type: 'Tipo de embarque',
+        pieces: 'Piezas / PCS',
+        transit: 'Tránsito',
+        route: 'Ruta',
+        payment: 'Condición pago',
+        description: 'Columna descripción',
+        application: 'Columna aplicación',
+        qty: 'Columna QTY',
+        amount: 'Columna cantidad',
+        min: 'Columna MIN',
+        max: 'Columna MAX',
+        total: 'Columna total',
+        terms: 'Título términos',
+        remarks: 'Notas',
+        internalComment: 'Comentario interno'
+      };
+
+      const field = (kind, key, label, value, extra = '') => `
+        <div class="template-field">
+          <label>${escapeHtml(label)}</label>
+          <input type="text" data-template-field="1" data-kind="${escapeHtml(kind)}" data-key="${escapeHtml(String(key))}" value="${escapeHtml(value ?? '')}" ${extra}>
+        </div>`;
+
+      let html = '';
+      html += `<p class="template-section-title">Plantilla activa: ${escapeHtml(currentType)} / ${escapeHtml(currentLang)}</p>`;
+      html += field('title', 'title', 'Título principal', current.title);
+
+      html += '<p class="template-section-title">Etiquetas</p>';
+      Object.keys(base.labels || {}).forEach(key => {
+        html += field('label', key, labelNames[key] || key, current.labels[key]);
+      });
+
+      html += '<p class="template-section-title">Cabeceras tabla de cargos</p>';
+      (base.headers || []).forEach((header, index) => {
+        const value = Array.isArray(override.headers) && typeof override.headers[index] === 'string'
+          ? override.headers[index]
+          : header;
+        html += field('header', index, `Columna ${index + 1}`, value);
+      });
+
+      html += '<p class="template-section-title">Secciones de cargos</p>';
+      getUniqueBaseSections(base).forEach(section => {
+        const value = override.sections && typeof override.sections[section] === 'string'
+          ? override.sections[section]
+          : section;
+        html += field('section', section, section, value);
+      });
+
+      html += '<p class="template-section-title">Títulos de términos</p>';
+      (base.terms || []).forEach((term, index) => {
+        const value = Array.isArray(override.termsTitles) && typeof override.termsTitles[index] === 'string'
+          ? override.termsTitles[index]
+          : term.title;
+        html += field('term', index, `Término ${index + 1}`, value);
+      });
+
+      templateTextFields.innerHTML = html;
+    }
+
+    function handleTemplateTextInput(event) {
+      const input = event.target.closest('[data-template-field="1"]');
+      if (!input) return;
+
+      const target = ensureTemplateOverride(currentType, currentLang);
+      const kind = input.dataset.kind;
+      const key = input.dataset.key;
+      const value = input.value;
+
+      if (kind === 'title') {
+        target.title = value;
+      } else if (kind === 'label') {
+        target.labels[key] = value;
+      } else if (kind === 'header') {
+        target.headers[Number(key)] = value;
+      } else if (kind === 'section') {
+        target.sections[key] = value;
+      } else if (kind === 'term') {
+        target.termsTitles[Number(key)] = value;
+      }
+
+      templateTextOverrides = cleanTemplateTextSettings(templateTextOverrides);
+      renderQuote();
+      templateTextStatus.textContent = 'Texto aplicado en tiempo real. Presiona Guardar textos para sincronizarlo.';
+    }
+
+    async function loadTemplateTextSettings() {
+      try {
+        const localSaved = JSON.parse(localStorage.getItem('dif_quote_template_text_settings') || 'null');
+        templateTextOverrides = cleanTemplateTextSettings(localSaved || {});
+        renderQuote();
+        renderTemplateTextEditor();
+        templateTextStatus.textContent = localSaved
+          ? 'Textos locales cargados. Buscando textos globales...'
+          : 'Textos estándar cargados. Buscando textos globales...';
+      } catch (err) {
+        templateTextOverrides = {};
+        renderQuote();
+        renderTemplateTextEditor();
+        templateTextStatus.textContent = 'Textos estándar cargados.';
+      }
+
+      try {
+        const data = await callCommentsApi({
+          accion: 'get',
+          numeroCotizacion: GLOBAL_TEMPLATE_TEXT_NUMBER,
+          tipoCotizacion: GLOBAL_TEMPLATE_TEXT_TYPE,
+          idioma: GLOBAL_TEMPLATE_TEXT_LANG,
+          token: COMMENTS_TOKEN
+        });
+
+        if (data.comentario) {
+          templateTextOverrides = cleanTemplateTextSettings(JSON.parse(data.comentario));
+          localStorage.setItem('dif_quote_template_text_settings', JSON.stringify(templateTextOverrides));
+          renderQuote();
+          renderTemplateTextEditor();
+          templateTextStatus.textContent = 'Textos globales cargados desde SharePoint.';
+        } else {
+          templateTextStatus.textContent = 'No hay textos globales guardados. Usando textos estándar/locales.';
+        }
+      } catch (err) {
+        console.error(err);
+        templateTextStatus.textContent = 'No se pudieron cargar los textos globales. Usando textos locales/estándar.';
+      }
+    }
+
+    async function saveTemplateTextSettings() {
+      templateTextOverrides = cleanTemplateTextSettings(templateTextOverrides);
+      localStorage.setItem('dif_quote_template_text_settings', JSON.stringify(templateTextOverrides));
+      templateTextStatus.textContent = 'Guardando textos globales en SharePoint...';
+      saveTemplateTextBtn.disabled = true;
+      resetTemplateTextBtn.disabled = true;
+
+      try {
+        await callCommentsApi({
+          accion: 'save',
+          numeroCotizacion: GLOBAL_TEMPLATE_TEXT_NUMBER,
+          tipoCotizacion: GLOBAL_TEMPLATE_TEXT_TYPE,
+          idioma: GLOBAL_TEMPLATE_TEXT_LANG,
+          comentario: JSON.stringify(templateTextOverrides),
+          usuario: 'IT Team - Textos Plantilla',
+          token: COMMENTS_TOKEN
+        });
+
+        templateTextStatus.textContent = 'Textos globales guardados. Se aplicarán en cualquier navegador que abra la web.';
+      } catch (err) {
+        console.error(err);
+        templateTextStatus.textContent = 'No se pudieron guardar los textos globales. Quedaron guardados solo en este navegador.';
+      } finally {
+        saveTemplateTextBtn.disabled = false;
+        resetTemplateTextBtn.disabled = false;
+      }
+    }
+
+    async function resetTemplateTextSettings() {
+      templateTextOverrides = {};
+      localStorage.setItem('dif_quote_template_text_settings', JSON.stringify(templateTextOverrides));
+      renderQuote();
+      renderTemplateTextEditor();
+      templateTextStatus.textContent = 'Restaurando textos estándar globales...';
+      saveTemplateTextBtn.disabled = true;
+      resetTemplateTextBtn.disabled = true;
+
+      try {
+        await callCommentsApi({
+          accion: 'save',
+          numeroCotizacion: GLOBAL_TEMPLATE_TEXT_NUMBER,
+          tipoCotizacion: GLOBAL_TEMPLATE_TEXT_TYPE,
+          idioma: GLOBAL_TEMPLATE_TEXT_LANG,
+          comentario: JSON.stringify({}),
+          usuario: 'IT Team - Textos Plantilla',
+          token: COMMENTS_TOKEN
+        });
+
+        templateTextStatus.textContent = 'Textos estándar guardados como plantilla global.';
+      } catch (err) {
+        console.error(err);
+        templateTextStatus.textContent = 'Textos restaurados localmente, pero no se pudieron sincronizar globalmente.';
+      } finally {
+        saveTemplateTextBtn.disabled = false;
+        resetTemplateTextBtn.disabled = false;
+      }
+    }
+
     function getFormatCssValues() {
       const f = currentFormatSettings;
       return {
@@ -1784,7 +2216,7 @@ ${root.innerHTML}
     }
 
     function getCurrentQuoteNumber() {
-      const q = quoteData[currentType][currentLang];
+      const q = getCurrentQuote();
       const match = String(q.title || '').match(/COT-\d+/i);
       return match ? match[0].toUpperCase() : String(q.title || '').trim();
     }
@@ -1895,7 +2327,7 @@ ${root.innerHTML}
     }
 
     function renderQuote() {
-      const q = quoteData[currentType][currentLang];
+      const q = getCurrentQuote();
       const commentVisible = localStorage.getItem(showCommentKey()) === '1';
       root.className = commentVisible ? 'show-comment' : '';
       root.innerHTML = '';
@@ -1945,6 +2377,7 @@ ${root.innerHTML}
       currentComment = '';
       commentBox.value = '';
       renderQuote();
+      renderTemplateTextEditor();
       statusText.textContent = 'Listo para escribir un comentario nuevo.';
     });
 
@@ -1959,6 +2392,7 @@ ${root.innerHTML}
         currentComment = '';
         commentBox.value = '';
         renderQuote();
+        renderTemplateTextEditor();
         statusText.textContent = 'Listo para escribir un comentario nuevo.';
       });
     });
@@ -2013,6 +2447,17 @@ ${root.innerHTML}
       });
     });
 
+    templateTextFields.addEventListener('input', handleTemplateTextInput);
+    saveTemplateTextBtn.addEventListener('click', saveTemplateTextSettings);
+    resetTemplateTextBtn.addEventListener('click', resetTemplateTextSettings);
+
+    toggleTemplateTextPanel.addEventListener('click', () => {
+      const collapsed = !templateTextPanel.classList.contains('collapsed');
+      templateTextPanel.classList.toggle('collapsed', collapsed);
+      toggleTemplateTextPanel.textContent = collapsed ? 'Mostrar' : 'Ocultar';
+      localStorage.setItem('dif_quote_template_text_panel_collapsed', collapsed ? '1' : '0');
+    });
+
     saveFormatBtn.addEventListener('click', saveFormatSettings);
     resetFormatBtn.addEventListener('click', resetFormatSettings);
 
@@ -2023,7 +2468,13 @@ ${root.innerHTML}
       localStorage.setItem('dif_quote_format_panel_collapsed', collapsed ? '1' : '0');
     });
 
+    const templateCollapsed = localStorage.getItem('dif_quote_template_text_panel_collapsed') === '1';
+    templateTextPanel.classList.toggle('collapsed', templateCollapsed);
+    toggleTemplateTextPanel.textContent = templateCollapsed ? 'Mostrar' : 'Ocultar';
+
+    renderTemplateTextEditor();
     loadSavedFormatSettings();
+    loadTemplateTextSettings();
     renderQuote();
     commentBox.value = '';
     currentComment = '';
