@@ -849,9 +849,9 @@
       <div class="format-actions">
         <button class="action-button primary" id="saveFormatBtn" type="button">Guardar formato</button>
         <button class="action-button" id="resetFormatBtn" type="button">Restaurar</button>
-        <span class="status-text" id="formatStatus">Los cambios se ven en tiempo real.</span>
+        <span class="status-text" id="formatStatus">Los cambios se ven en tiempo real. Guarda para sincronizar globalmente.</span>
       </div>
-      <div class="format-note">El formato se guarda en este navegador. El HTML copiado para Send Email V2 usa estos valores.</div>
+      <div class="format-note">El formato guardado se sincroniza en SharePoint vía Power Automate y se aplica a cualquier navegador que abra esta web.</div>
     </section>
 
     <section class="comments-panel">
@@ -875,6 +875,9 @@
     const LOGO_URL = 'https://dif.com.do/img/dif.png';
     const POWER_AUTOMATE_COMMENTS_URL = 'https://48f0fcb04df7e0b687051ce009ac53.03.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3e059c56be694532bc45ac7d854c951b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bNTv8KYGPEFyj4tpW9_E1al-dR3h8nOpeKZxAJWwjBA';
     const COMMENTS_TOKEN = 'dif-cotizaciones-2026';
+    const GLOBAL_FORMAT_NUMBER = 'GLOBAL-FORMAT';
+    const GLOBAL_FORMAT_TYPE = 'FORMAT';
+    const GLOBAL_FORMAT_LANG = 'GLOBAL';
 
     const termsCatalog = {
       "Aduana / Aéreo": {
@@ -1577,29 +1580,95 @@ ${root.innerHTML}
       if (rerender) renderQuote();
     }
 
-    function loadSavedFormatSettings() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('dif_quote_format_settings') || 'null');
-        applyFormatSettings(saved || defaultFormatSettings, false);
-        formatStatus.textContent = saved ? 'Formato guardado cargado.' : 'Formato estándar cargado.';
-      } catch (err) {
-        applyFormatSettings(defaultFormatSettings, false);
-        formatStatus.textContent = 'Formato estándar cargado.';
-      }
+    async function loadSavedFormatSettings() {
+      const localSaved = JSON.parse(localStorage.getItem('dif_quote_format_settings') || 'null');
+      applyFormatSettings(localSaved || defaultFormatSettings, false);
+
       const collapsed = localStorage.getItem('dif_quote_format_panel_collapsed') === '1';
       formatPanel.classList.toggle('collapsed', collapsed);
       toggleFormatPanel.textContent = collapsed ? 'Mostrar' : 'Ocultar';
+
+      formatStatus.textContent = localSaved
+        ? 'Formato local cargado. Buscando formato global...'
+        : 'Formato estándar cargado. Buscando formato global...';
+
+      try {
+        const data = await callCommentsApi({
+          accion: 'get',
+          numeroCotizacion: GLOBAL_FORMAT_NUMBER,
+          tipoCotizacion: GLOBAL_FORMAT_TYPE,
+          idioma: GLOBAL_FORMAT_LANG,
+          token: COMMENTS_TOKEN
+        });
+
+        if (data.comentario) {
+          const globalSettings = normalizeFormatSettings(JSON.parse(data.comentario));
+          localStorage.setItem('dif_quote_format_settings', JSON.stringify(globalSettings));
+          applyFormatSettings(globalSettings);
+          formatStatus.textContent = 'Formato global cargado desde SharePoint.';
+        } else {
+          formatStatus.textContent = 'No hay formato global guardado. Usando formato estándar/local.';
+        }
+      } catch (err) {
+        console.error(err);
+        formatStatus.textContent = 'No se pudo cargar el formato global. Usando formato local/estándar.';
+      }
     }
 
-    function saveFormatSettings() {
-      localStorage.setItem('dif_quote_format_settings', JSON.stringify(currentFormatSettings));
-      formatStatus.textContent = 'Formato guardado como predeterminado en este navegador.';
+    async function saveFormatSettings() {
+      const settingsToSave = normalizeFormatSettings(currentFormatSettings);
+      localStorage.setItem('dif_quote_format_settings', JSON.stringify(settingsToSave));
+      formatStatus.textContent = 'Guardando formato global en SharePoint...';
+      saveFormatBtn.disabled = true;
+      resetFormatBtn.disabled = true;
+
+      try {
+        await callCommentsApi({
+          accion: 'save',
+          numeroCotizacion: GLOBAL_FORMAT_NUMBER,
+          tipoCotizacion: GLOBAL_FORMAT_TYPE,
+          idioma: GLOBAL_FORMAT_LANG,
+          comentario: JSON.stringify(settingsToSave),
+          usuario: 'IT Team - Formato Web',
+          token: COMMENTS_TOKEN
+        });
+
+        formatStatus.textContent = 'Formato global guardado. Se aplicará en cualquier navegador que abra la web.';
+      } catch (err) {
+        console.error(err);
+        formatStatus.textContent = 'No se pudo guardar el formato global. Se mantuvo guardado solo en este navegador.';
+      } finally {
+        saveFormatBtn.disabled = false;
+        resetFormatBtn.disabled = false;
+      }
     }
 
-    function resetFormatSettings() {
-      localStorage.removeItem('dif_quote_format_settings');
+    async function resetFormatSettings() {
       applyFormatSettings(defaultFormatSettings);
-      formatStatus.textContent = 'Formato restaurado al estándar.';
+      localStorage.setItem('dif_quote_format_settings', JSON.stringify(defaultFormatSettings));
+      formatStatus.textContent = 'Restaurando formato estándar global...';
+      saveFormatBtn.disabled = true;
+      resetFormatBtn.disabled = true;
+
+      try {
+        await callCommentsApi({
+          accion: 'save',
+          numeroCotizacion: GLOBAL_FORMAT_NUMBER,
+          tipoCotizacion: GLOBAL_FORMAT_TYPE,
+          idioma: GLOBAL_FORMAT_LANG,
+          comentario: JSON.stringify(defaultFormatSettings),
+          usuario: 'IT Team - Formato Web',
+          token: COMMENTS_TOKEN
+        });
+
+        formatStatus.textContent = 'Formato estándar guardado como formato global.';
+      } catch (err) {
+        console.error(err);
+        formatStatus.textContent = 'Formato estándar restaurado localmente, pero no se pudo sincronizar globalmente.';
+      } finally {
+        saveFormatBtn.disabled = false;
+        resetFormatBtn.disabled = false;
+      }
     }
 
     function getFormatCssValues() {
